@@ -10,7 +10,7 @@ async function readApprovalTeal(){
 }
 
 async function readClearTeal(){
-    clearProgramSource = `#pragma version 4
+    clearProgramSource = `#pragma version 6
     int 1
     `;
     var content = await getCompiledResult(clearProgramSource);
@@ -25,7 +25,7 @@ async function getCompiledResult(data){
 async function compileTEAL(content){
     // Setup AlgodClient Connection
     const algodToken = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-    const algodServer = 'http://localhost';
+    const algodServer = 'http://3.145.206.208';
     const algodPort = 4001;
     let algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
 
