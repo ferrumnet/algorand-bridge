@@ -43,8 +43,8 @@ async function deployContract(){
     // declare application state storage (immutable)
     localInts = 3;
     localBytes = 3;
-    globalInts = 7;
-    globalBytes = 5;
+    globalInts = 10;
+    globalBytes = 10;
 
         // Get ByteCode of Approval Program
     let approvalProgram = await readApprovalTeal();
