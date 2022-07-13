@@ -75,6 +75,7 @@ contract GeneralTaxDistributorDiscrete {
 
         uint256 remaining = balance;
         uint256 w = target.weights;
+
         for (uint8 i = 0; i < target.len; i++) {
             uint8 mi = 8 * i;
             uint256 mask = 0xff << mi;
@@ -82,6 +83,7 @@ contract GeneralTaxDistributorDiscrete {
             poolRatio = poolRatio >> mi;
 
             uint256 amount = poolRatio * balance / target.totalW;
+            
             if (remaining > amount) {
                 remaining -= amount;
             } else {
