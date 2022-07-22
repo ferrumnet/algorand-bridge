@@ -1,0 +1,121 @@
+#pragma version 6
+txn ApplicationID
+int 0
+==
+bnz main_l10
+txn OnCompletion
+int NoOp
+==
+bnz main_l7
+txn OnCompletion
+int UpdateApplication
+==
+bnz main_l6
+txn OnCompletion
+int DeleteApplication
+==
+bnz main_l5
+err
+main_l5:
+int 1
+return
+main_l6:
+int 0
+return
+main_l7:
+txna ApplicationArgs 0
+byte "ecdsa-recover"
+==
+bnz main_l9
+err
+main_l9:
+byte "signer"
+byte "0xfc0b3a47ab582027c585043ccaa62b0800f38f061cd454ae7e28897a7cf4397b"
+byte "0x5272dc4f0e7fdb721d08bce261b3e3fb7fc0315b7ddc8fd4b46e8ca0298c705d5077c1a1ccc488f4f4516eaf0f149f713caba91b9e7e1e9d9d0788d0298577751c"
+callsub ethecdsarecover_0
+app_global_put
+int 1
+return
+main_l10:
+global GroupSize
+int 1
+==
+assert
+int 1
+return
+
+// eth_ecdsa_recover
+ethecdsarecover_0:
+store 1
+store 0
+load 1
+len
+int 65
+==
+assert
+load 0
+len
+int 32
+==
+assert
+int 2500
+int 10
++
+store 2
+ethecdsarecover_0_l1:
+load 2
+global OpcodeBudget
+>
+bz ethecdsarecover_0_l3
+itxn_begin
+int appl
+itxn_field TypeEnum
+int DeleteApplication
+itxn_field OnCompletion
+byte 0x068101
+itxn_field ApprovalProgram
+byte 0x068101
+itxn_field ClearStateProgram
+itxn_submit
+b ethecdsarecover_0_l1
+ethecdsarecover_0_l3:
+load 1
+extract 32 32
+byte 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0
+b<=
+assert
+load 1
+extract 64 1
+btoi
+int 27
+-
+int 0
+==
+load 1
+extract 64 1
+btoi
+int 27
+-
+int 1
+==
+||
+assert
+load 0
+load 1
+extract 64 1
+btoi
+int 27
+-
+load 1
+extract 0 32
+load 1
+extract 32 32
+ecdsa_pk_recover Secp256k1
+store 4
+store 3
+load 3
+load 4
+concat
+keccak256
+extract 12 20
+retsub

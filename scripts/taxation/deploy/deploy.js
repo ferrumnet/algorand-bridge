@@ -24,27 +24,36 @@ async function deployContract(){
     let suggestedParams = await algodClient.getTransactionParams().do();
     suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
     suggestedParams.flatFee = true;
-            let token_address = 81317600;    
-            let bridge_fee = 0.0025 * 10000; // bridge_fee
+    let token_address = 81317600;    
             
 // python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(93217615).to_bytes(8, 'big'))))"
+    // let _len = 2;
+    // let _totalW = 3;
+    // let _weights = 2;
 
+    let _global_len = 3;
+    let _global_totalW = 4;
+    // let _global_weights = 3;
+
+    // let _target_type = "address";
 
             let appArgs = [];
 
-            appArgs.push(algosdk.encodeUint64(bridge_fee));
             appArgs.push(algosdk.encodeUint64(token_address));
- 
+            appArgs.push(algosdk.encodeUint64(_global_len));
+            appArgs.push(algosdk.encodeUint64(_global_totalW));
+            // appArgs.push(algosdk.encodeUint64(_global_weights));
+
             accounts = [];
             foreignApps = [];
             foreignAssets = [];
             foreignAssets.push(token_address);
 
     // declare application state storage (immutable)
-    localInts = 3;
-    localBytes = 3;
-    globalInts = 20;
-    globalBytes = 20;
+    localInts = 2;
+    localBytes = 2;
+    globalInts = 30;
+    globalBytes = 30;
 
         // Get ByteCode of Approval Program
     let approvalProgram = await readApprovalTeal();

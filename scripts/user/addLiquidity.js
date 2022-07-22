@@ -34,7 +34,7 @@ async function noop() {
    
 //python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(79584368).to_bytes(8, 'big'))))"
 
-let index = 98492040;
+let index = 100446236;
 let token_address = 81317600;
 let revocationTarget = undefined;
 let closeRemainderTo = undefined;

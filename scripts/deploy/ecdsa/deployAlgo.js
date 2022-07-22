@@ -1,7 +1,7 @@
 const { waitForConfirmation, ALGORAND_MIN_TX_FEE } = require('algosdk');
 const algosdk = require('algosdk');
 const { readApprovalTeal, readClearTeal } = require('./compile');
-
+var ByteBuffer = require('bytebuffer');
 
 // Node must have EnableDeveloperAPI set to true in its config 
 
@@ -22,27 +22,31 @@ async function deployContract(){
 
     // get node suggested parameters (sp)
     let suggestedParams = await algodClient.getTransactionParams().do();
-    suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
+    suggestedParams.fee = 50000;
     suggestedParams.flatFee = true;
-            let token_address = 81317600;    
-            let bridge_fee = 0.0025 * 10000; // bridge_fee
             
 // python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(93217615).to_bytes(8, 'big'))))"
+            // let signature = "5272dc4f0e7fdb721d08bce261b3e3fb7fc0315b7ddc8fd4b46e8ca0298c705d5077c1a1ccc488f4f4516eaf0f149f713caba91b9e7e1e9d9d0788d0298577751c";
+            let hash = "fc0b3a47ab582027c585043ccaa62b0800f38f061cd454ae7e28897a7cf4397b";
+            
+            // let signByte = ByteBuffer.fromHex(signature, undefined, undefined);
+            // let signBuffer = signByte.buffer;
 
+            // let hashByte = ByteBuffer.fromHex(hash, undefined, undefined);
+            // let hashBuffer = hashByte.buffer;
 
             let appArgs = [];
 
-            appArgs.push(algosdk.encodeUint64(bridge_fee));
-            appArgs.push(algosdk.encodeUint64(token_address));
+            // appArgs.push(new Uint8Array(Buffer.from(hash)));
+            // appArgs.push(new Uint8Array(Buffer.from(signBuffer)));
  
             accounts = [];
             foreignApps = [];
             foreignAssets = [];
-            foreignAssets.push(token_address);
 
     // declare application state storage (immutable)
-    localInts = 3;
-    localBytes = 3;
+    localInts = 0;
+    localBytes = 0;
     globalInts = 20;
     globalBytes = 20;
 

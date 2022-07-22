@@ -1,6 +1,6 @@
 const { waitForConfirmation, default: algosdk, ALGORAND_MIN_TX_FEE } = require('algosdk');
 // require('./deploy.js');
-
+var ByteBuffer = require('bytebuffer');
 noop();
 
 async function noop() {
@@ -32,7 +32,7 @@ async function noop() {
    
 //python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(79584368).to_bytes(8, 'big'))))"
 
-let index = 98492040;
+let index = 100312521;
 let token_address = 81317600;
 let revocationTarget = undefined;
 let closeRemainderTo = undefined;
@@ -43,7 +43,10 @@ foreignAssets = [];
 foreignAssets.push(token_address);
 
 let action = "add-signer";
-let _signer = "2cc1166f6212628A0deEf2B33BEFB2187D35b86c";
+let _signer = "CDE782DEE9643b02DDE8a11499ede81EC1D05dD3";
+let _signerByte = ByteBuffer.fromHex(_signer, undefined, undefined);
+_signer = _signerByte.buffer;
+console.log(_signer);
 let appArgs = [];
 appArgs.push(new Uint8Array(Buffer.from(action)));
 appArgs.push(new Uint8Array(Buffer.from(_signer)));

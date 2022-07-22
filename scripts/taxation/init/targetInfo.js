@@ -1,6 +1,6 @@
 const { waitForConfirmation,ALGORAND_MIN_TX_FEE, default: algosdk } = require('algosdk');
 // require('./deploy.js');
-const EthCrypto = require('eth-crypto');
+
 setup();
 
 async function setup() {
@@ -19,17 +19,24 @@ async function setup() {
 let suggestedParams = await algodClient.getTransactionParams().do();
 suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
 suggestedParams.flatFee = true;
-let index = 100446236;
+let index = 100326542;
 let token_address = 81317600;  
-
-account = [];
+let _target = "HFYC6SVT5MJIR7A5JFA5EIINDS43RX4RU4WXMJPKLLALNMKAI4HIDRED3I";
+account = [_target];
 foreignApp = [];
 foreignAssets = [];
 foreignAssets.push(token_address);
 
-let action = "setup";
-let appArgs = [];
-appArgs.push(new Uint8Array(Buffer.from(action)));
+let action = "target-info";
+let _target_type = "address";
+// let _target_weights = 1
+let _count = 2;
+
+        let appArgs = [];
+        appArgs.push(new Uint8Array(Buffer.from(action)));
+        appArgs.push(new Uint8Array(Buffer.from(_target_type)));
+        // appArgs.push(algosdk.encodeUint64(_target_weights));
+        appArgs.push(algosdk.encodeUint64(_count));
 
 // create unsigned transaction
 let txn = algosdk.makeApplicationNoOpTxn(sender, suggestedParams, index, appArgs, account, foreignApp, foreignAssets);
@@ -52,6 +59,6 @@ await waitForConfirmation(algodClient, txId, timeout);
 
 // response display 
 let txResponse = await algodClient.pendingTransactionInformation(txId).do();
-console.log("Setup Contract [App-ID]: ", txResponse['txn']['txn']['apid'] );
+console.log("Target Info Added [App-ID]: ", txResponse['txn']['txn']['apid'] );
 
 }
