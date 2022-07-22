@@ -34,7 +34,7 @@ let suggestedParams = await algodClient.getTransactionParams().do();
 suggestedParams.fee = 50000;
 // suggestedParams.flatFee = true;
 
-let index = 98492040;
+let index = 100446236;
 let token_address = 81317600;
 account = ["GAJPADR5Y3ESQMP2LRGYKEADLBW6HXS5E3MDTQ7PCQS76EZTFJ4ZYH2VIE"];
 foreignApp = [];
@@ -44,17 +44,22 @@ foreignAssets.push(token_address);
 // withdraw_token(_token,_amount, _receiver, salt, signature),
 let action = "withdraw";
 let amount = 100;
-let message = "OpenZeppelin1";
-let signature = "5d99b6f7f6d1f73d1a26497f2b1c89b24c0993913f86e9a2d02cd69887d9c94f3c880358579d811b21dd1b7fd9bb01c1d81d10e69f0384e675c32b39643be8921b";
+// let message = "OpenZeppelin1";
+let signature = "5272dc4f0e7fdb721d08bce261b3e3fb7fc0315b7ddc8fd4b46e8ca0298c705d5077c1a1ccc488f4f4516eaf0f149f713caba91b9e7e1e9d9d0788d0298577751c";
 let signByte = ByteBuffer.fromHex(signature, undefined, undefined);
-let signBuffer = signByte.buffer;
+signature = signByte.buffer;
+let salt = "f3c0b3a47ab582027c585043ccaa62b0800f38f061cd454ae7e28897a7cf4397";
+let saltByte = ByteBuffer.fromHex(salt, undefined, undefined);
+salt = saltByte.buffer;
+let algoChainID = 1122;
 
 let appArgs = [];
 appArgs.push(new Uint8Array(Buffer.from(action)))
 appArgs.push(algosdk.encodeUint64(token_address));
 appArgs.push(algosdk.encodeUint64(amount));
-appArgs.push(new Uint8Array(Buffer.from(message)));
-appArgs.push(new Uint8Array(Buffer.from(signBuffer)));
+appArgs.push(new Uint8Array(Buffer.from(salt)));
+appArgs.push(new Uint8Array(Buffer.from(signature)));
+appArgs.push(algosdk.encodeUint64(algoChainID));
 
 // create unsigned transaction
 let txn = algosdk.makeApplicationNoOpTxn(sender, suggestedParams, index, appArgs, account, foreignApp, foreignAssets);

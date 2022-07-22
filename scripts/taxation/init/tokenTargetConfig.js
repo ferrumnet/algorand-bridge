@@ -1,9 +1,9 @@
-const { waitForConfirmation, default: algosdk, ALGORAND_MIN_TX_FEE } = require('algosdk');
+const { waitForConfirmation,ALGORAND_MIN_TX_FEE, default: algosdk } = require('algosdk');
 // require('./deploy.js');
 
-noop();
+setup();
 
-async function noop() {
+async function setup() {
         // Setup AlgodClient Connection
         const algodToken = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
         const algodServer = 'http://3.145.206.208';
@@ -15,39 +15,25 @@ async function noop() {
     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
     let sender = creatorAccount.addr;
     
-// // Staker 1 
-// let userMnemonic = "bulk narrow warrior rally table smoke return pyramid drink sphere picnic rice manage village purse illegal problem trim arrange urban theme nerve dragon abstract chalk";
-// let userAccount = algosdk.mnemonicToSecretKey(userMnemonic);
-// let sender = userAccount.addr;
-
-// // Staker 2
-// let userMnemonic = "tackle illegal poverty push label proof vessel trial fee stem naive fatal muffin smart wink equip frost remove cup radar pilot awake flip above negative";
-// let userAccount = algosdk.mnemonicToSecretKey(userMnemonic);
-// let sender = userAccount.addr;
- 
 // get node suggested parameters (sp)
-    let suggestedParams = await algodClient.getTransactionParams().do();
-    suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
-    suggestedParams.flatFee = true;
-   
-//python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(79584368).to_bytes(8, 'big'))))"
-
-let index = 100065221;
-let token_address = 81317600;
-let revocationTarget = undefined;
-let closeRemainderTo = undefined;
-let note = undefined;
+let suggestedParams = await algodClient.getTransactionParams().do();
+suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
+suggestedParams.flatFee = true;
+let index = 100326542;
+let token_address = 81317600;  
 account = [];
 foreignApp = [];
 foreignAssets = [];
 foreignAssets.push(token_address);
 
-let action = "remove-signer";
-let _signer = "2cc1166f6212628A0deEf2B33BEFB2187D35b86c";
-let appArgs = [];
-appArgs.push(new Uint8Array(Buffer.from(action)));
-appArgs.push(new Uint8Array(Buffer.from(_signer)));
-
+let action = "token-target-config";
+let _len = 3;
+let _totalW = 4;
+        let appArgs = [];
+        appArgs.push(new Uint8Array(Buffer.from(action)));
+        appArgs.push(algosdk.encodeUint64(token_address));
+        appArgs.push(algosdk.encodeUint64(_len));
+        appArgs.push(algosdk.encodeUint64(_totalW));
 
 // create unsigned transaction
 let txn = algosdk.makeApplicationNoOpTxn(sender, suggestedParams, index, appArgs, account, foreignApp, foreignAssets);
@@ -70,6 +56,6 @@ await waitForConfirmation(algodClient, txId, timeout);
 
 // response display 
 let txResponse = await algodClient.pendingTransactionInformation(txId).do();
-console.log("Signer is removed from the BridgePool Contract [App-ID]: ", txResponse['txn']['txn']['apid'] );
+console.log("TokenTargetConfig Added [App-ID]: ", txResponse['txn']['txn']['apid'] );
 
 }

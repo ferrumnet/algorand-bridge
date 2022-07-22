@@ -1,9 +1,9 @@
-const { waitForConfirmation, default: algosdk, ALGORAND_MIN_TX_FEE } = require('algosdk');
+const { waitForConfirmation,ALGORAND_MIN_TX_FEE, default: algosdk } = require('algosdk');
 // require('./deploy.js');
 
-noop();
+setup();
 
-async function noop() {
+async function setup() {
         // Setup AlgodClient Connection
         const algodToken = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
         const algodServer = 'http://3.145.206.208';
@@ -15,42 +15,22 @@ async function noop() {
     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
     let sender = creatorAccount.addr;
     
-// // Staker 1 
-// let userMnemonic = "bulk narrow warrior rally table smoke return pyramid drink sphere picnic rice manage village purse illegal problem trim arrange urban theme nerve dragon abstract chalk";
-// let userAccount = algosdk.mnemonicToSecretKey(userMnemonic);
-// let sender = userAccount.addr;
-
-// // Staker 2
-// let userMnemonic = "tackle illegal poverty push label proof vessel trial fee stem naive fatal muffin smart wink equip frost remove cup radar pilot awake flip above negative";
-// let userAccount = algosdk.mnemonicToSecretKey(userMnemonic);
-// let sender = userAccount.addr;
- 
 // get node suggested parameters (sp)
-    let suggestedParams = await algodClient.getTransactionParams().do();
-    suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
-    suggestedParams.flatFee = true;
-   
-//python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(79584368).to_bytes(8, 'big'))))"
-
-let index = 100446236;
-let token_address = 81317600;
-let revocationTarget = undefined;
-let closeRemainderTo = undefined;
-let note = undefined;
-account = [];
+let suggestedParams = await algodClient.getTransactionParams().do();
+suggestedParams.fee =500000;
+suggestedParams.flatFee = true;
+let index = 100326542;
+let token_address = 81317600;  
+let _origin = "V4RFEEPLSXDFQ22Q45Q47ZZN5IWUQRAQTFI5N6JR3UOLHLD3UYPORMRALY";
+account = [_origin, "GAJPADR5Y3ESQMP2LRGYKEADLBW6HXS5E3MDTQ7PCQS76EZTFJ4ZYH2VIE", "RPWOPFEMNLC3H3KMU7W6T2FJ637RD5TF4X46DM5ECZPQRECUTGXM57YEIE", "HFYC6SVT5MJIR7A5JFA5EIINDS43RX4RU4WXMJPKLLALNMKAI4HIDRED3I"];
 foreignApp = [];
 foreignAssets = [];
 foreignAssets.push(token_address);
 
-let action = "set-fee";
-
-let _fee10000 = 0.0020 * 10000;
-
+let action = "distribute-tax-avoid-origin";
 let appArgs = [];
 appArgs.push(new Uint8Array(Buffer.from(action)));
-
 appArgs.push(algosdk.encodeUint64(token_address));
-appArgs.push(algosdk.encodeUint64(_fee10000));
 
 // create unsigned transaction
 let txn = algosdk.makeApplicationNoOpTxn(sender, suggestedParams, index, appArgs, account, foreignApp, foreignAssets);
@@ -73,6 +53,6 @@ await waitForConfirmation(algodClient, txId, timeout);
 
 // response display 
 let txResponse = await algodClient.pendingTransactionInformation(txId).do();
-console.log("Token Fee is set for the BridgePool Contract [App-ID]: ", txResponse['txn']['txn']['apid'] );
+console.log("Setup Contract [App-ID]: ", txResponse['txn']['txn']['apid'] );
 
 }

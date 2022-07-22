@@ -47,9 +47,9 @@ foreignAssets.push(token_address);
 
 let action = "swap";
 let amount = 50;
-let target_token = "0xA719b8aB7EA7AF0DDb4358719a34631bb79d15Dc";
+let target_token = "A719b8aB7EA7AF0DDb4358719a34631bb79d15Dc";
 let target_network = 56;
-let target_address = "0xA719b8aB7EXYZDDb4358719a34631b930X39Ax";
+let target_address = "A719b8aB7EXYZDDb4358719a34631b930X39Ax";
 
 let appArgs = [];
 appArgs.push(new Uint8Array(Buffer.from(action)));
@@ -90,7 +90,7 @@ let tx = (await algodClient.sendRawTransaction(signed).do());
 console.log("Transaction : " + tx.txId);
 
 // Wait for transaction to be confirmed
-await waitForConfirmation(algodClient, tx.txId, 5)
+await waitForConfirmation(algodClient, tx.txId,10)
 
 // response display 
 let transactionResponse = await algodClient.pendingTransactionInformation(tx.txId).do();

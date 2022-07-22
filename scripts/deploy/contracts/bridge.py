@@ -7,9 +7,7 @@ def approval_program():
     bridge_fee = Bytes("bridge_fee")
     token = Bytes("token")
     signer = Bytes("signer")
-    target_network = Bytes("target_network")
     target_token = Bytes("target_token")
-    target_address = Bytes("target_address")
     application_admin = Bytes("application_admin")
 
 # Global States Mapping
@@ -74,7 +72,7 @@ def approval_program():
         ])
 
     @Subroutine(TealType.none)
-    def withdraw_token(token, amount, payee, salt, signature):
+    def withdraw_token(token, amount, payee, salt, signature, algo_chain_id):
         # Scratch Variables
         fee = ScratchVar(TealType.uint64)
         token_amount = ScratchVar(TealType.uint64)
@@ -83,25 +81,26 @@ def approval_program():
             Assert(amount != Int(0)),
 
             # chain ID of algorand in signed Message 
-            message.store(Keccak256(Concat(Itob(token), payee, Itob(amount), salt))),
-            # message.store(Keccak256(salt)),
-            App.globalPut(signed_message, message.load()),
+            # message.store(Keccak256(Concat(Itob(token), payee, Itob(amount), Itob(algo_chain_id), salt))),
+            
+            # message.store(salt),
+            App.globalPut(signed_message, salt),
 
             # require(!usedHashes[signed_message], "Message already used");
             # If signed_message exist in (used_hash) returns 1 
             # then stop tx as signed_message is already used
-            Assert(App.globalGet(Concat(App.globalGet(signed_message), used_hash)) != Int(1)),
+            Assert(App.globalGet(Concat(used_hash, salt)) != Int(1)),
 
             # App.globalPut(signer, eth_ecdsa_recover(App.globalGet(signed_message), signature)),
-            App.globalPut(signer, eth_ecdsa_recover(App.globalGet(signed_message), signature)),
+            App.globalPut(signer, eth_ecdsa_recover(salt, signature)),
 
             # usedHashes[signed_message] = true;
             # Since the signed_messaged is used now add it to 
             # used_hash array as True. 
-            App.globalPut(Concat(App.globalGet(signed_message), used_hash), Int(1)),
+            App.globalPut(Concat(used_hash, salt), Int(1)),
 
-            # Verify if the signer exist           
-            # Assert(App.globalGet(Concat(App.globalGet(signer), signers)) != Int(0)),
+            # # Verify if the signer exist           
+            # Assert(App.globalGet(Concat(signers, App.globalGet(signer))) != Int(0)),
 
             # Logic of Tax distribution
             token_amount.store(amount),
@@ -119,14 +118,14 @@ def approval_program():
     @Subroutine(TealType.none)
     def add_signer(_signer):
         return Seq([
-        App.globalPut(Concat(_signer, signers), Int(1))
+        App.globalPut(Concat(signers, _signer), Int(1))
     ])
 
     @Subroutine(TealType.none)
     def remove_signer(_signer):
         return Seq([
         # App.globalPut(Concat(_signer, signers), Int(0))
-        App.globalDel(Concat(_signer, signers)),
+        App.globalDel(Concat(signers, _signer)),
     ])
 
     @Subroutine(TealType.none)
@@ -243,10 +242,11 @@ def approval_program():
     _amount = Btoi(Txn.application_args[2])
     _salt = Txn.application_args[3]
     _signature = Txn.application_args[4]
+    algo_chain_id = Btoi(Txn.application_args[5])
     # Method WITHDRAW
     on_withdraw = Seq([
         # is_application_admin,
-        withdraw_token(_token, _amount, Txn.sender(), _salt, _signature),
+        withdraw_token(_token, _amount, Txn.sender(), _salt, _signature, algo_chain_id),
         Approve(),
     ])
 
@@ -337,7 +337,7 @@ def approval_program():
         [on_call_method == Bytes("withdraw"), on_withdraw]
     )
     on_delete = Seq([ 
-        Reject(),
+        Approve(),
     ])
     on_update = Seq([ 
         Reject(),
