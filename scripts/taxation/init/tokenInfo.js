@@ -19,7 +19,7 @@ async function setup() {
 let suggestedParams = await algodClient.getTransactionParams().do();
 suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
 suggestedParams.flatFee = true;
-let index = 100326542;
+let index = 107194846;
 let token_address = 81317600;  
 account = [];
 foreignApp = [];
@@ -27,7 +27,7 @@ foreignAssets = [];
 foreignAssets.push(token_address);
 
 let action = "token-info";
-let _buffer_size = 1000;
+let _buffer_size = 500;
 let _token_config = 1;
 
 let appArgs = [];
@@ -57,6 +57,6 @@ await waitForConfirmation(algodClient, txId, timeout);
 
 // response display 
 let txResponse = await algodClient.pendingTransactionInformation(txId).do();
-console.log("Setup Contract [App-ID]: ", txResponse['txn']['txn']['apid'] );
+console.log("Token Info Added to Contract [App-ID]: ", txResponse['txn']['txn']['apid'] );
 
 }

@@ -14,6 +14,10 @@ async function deployContract(){
     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
     let sender = creatorAccount.addr;
 
+// // Staker 2
+// let creatorMnemonic = "tackle illegal poverty push label proof vessel trial fee stem naive fatal muffin smart wink equip frost remove cup radar pilot awake flip above negative";
+// let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
+// let sender = creatorAccount.addr;
         // Setup AlgodClient Connection
         const algodToken = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
         const algodServer = 'http://3.145.206.208';
@@ -26,6 +30,7 @@ async function deployContract(){
     suggestedParams.flatFee = true;
             let token_address = 81317600;    
             let bridge_fee = 0.0025 * 10000; // bridge_fee
+            let token_buffer = 500;
             
 // python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(93217615).to_bytes(8, 'big'))))"
 
@@ -34,15 +39,17 @@ async function deployContract(){
 
             appArgs.push(algosdk.encodeUint64(bridge_fee));
             appArgs.push(algosdk.encodeUint64(token_address));
- 
-            accounts = [];
+            appArgs.push(algosdk.encodeUint64(token_buffer));
+
+            let owner = "GAJPADR5Y3ESQMP2LRGYKEADLBW6HXS5E3MDTQ7PCQS76EZTFJ4ZYH2VIE";
+            accounts = [owner];
             foreignApps = [];
             foreignAssets = [];
             foreignAssets.push(token_address);
 
     // declare application state storage (immutable)
-    localInts = 3;
-    localBytes = 3;
+    localInts = 1;
+    localBytes = 1;
     globalInts = 20;
     globalBytes = 20;
 

@@ -10,15 +10,15 @@ async function noop() {
         const algodPort = 4001;
         let algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
 
-// ADMIN
-    let creatorMnemonic = "flight permit skill quick enforce strong hobby cloud letter foot can fee affair buddy exact link glare amused drama rain airport casual shoe abstract puppy";
-    let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
-    let sender = creatorAccount.addr;
+// // ADMIN
+//     let creatorMnemonic = "flight permit skill quick enforce strong hobby cloud letter foot can fee affair buddy exact link glare amused drama rain airport casual shoe abstract puppy";
+//     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
+//     let sender = creatorAccount.addr;
     
-// // Staker 1 
-// let userMnemonic = "bulk narrow warrior rally table smoke return pyramid drink sphere picnic rice manage village purse illegal problem trim arrange urban theme nerve dragon abstract chalk";
-// let userAccount = algosdk.mnemonicToSecretKey(userMnemonic);
-// let sender = userAccount.addr;
+// Staker 1 
+let creatorMnemonic = "bulk narrow warrior rally table smoke return pyramid drink sphere picnic rice manage village purse illegal problem trim arrange urban theme nerve dragon abstract chalk";
+let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
+let sender = creatorAccount.addr;
 
 // // Staker 2
 // let userMnemonic = "tackle illegal poverty push label proof vessel trial fee stem naive fatal muffin smart wink equip frost remove cup radar pilot awake flip above negative";
@@ -32,7 +32,7 @@ async function noop() {
    
 //python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(79584368).to_bytes(8, 'big'))))"
 
-let index = 100312521;
+let index = 107308165;
 let token_address = 81317600;
 let revocationTarget = undefined;
 let closeRemainderTo = undefined;
@@ -43,7 +43,7 @@ foreignAssets = [];
 foreignAssets.push(token_address);
 
 let action = "add-signer";
-let _signer = "CDE782DEE9643b02DDE8a11499ede81EC1D05dD3";
+let _signer = "0bdb79846e8331a19a65430363f240ec8acc2a52";
 let _signerByte = ByteBuffer.fromHex(_signer, undefined, undefined);
 _signer = _signerByte.buffer;
 console.log(_signer);

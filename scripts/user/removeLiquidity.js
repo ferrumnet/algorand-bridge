@@ -21,9 +21,9 @@ async function noop() {
 // let sender = creatorAccount.addr;
 
 // // Staker 2
-// let userMnemonic = "tackle illegal poverty push label proof vessel trial fee stem naive fatal muffin smart wink equip frost remove cup radar pilot awake flip above negative";
-// let userAccount = algosdk.mnemonicToSecretKey(userMnemonic);
-// let sender = userAccount.addr;
+// let creatorMnemonic = "tackle illegal poverty push label proof vessel trial fee stem naive fatal muffin smart wink equip frost remove cup radar pilot awake flip above negative";
+// let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
+// let sender = creatorAccount.addr;
  
 // get node suggested parameters (sp)
     let suggestedParams = await algodClient.getTransactionParams().do();
@@ -32,7 +32,7 @@ async function noop() {
    
 //python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(79584368).to_bytes(8, 'big'))))"
 
-let index = 98492040;
+let index = 107308165;
 let token_address = 81317600;
 account = [];
 foreignApp = [];

@@ -1,11 +1,13 @@
 const { waitForConfirmation,ALGORAND_MIN_TX_FEE, default: algosdk } = require('algosdk');
 // require('./deploy.js');
+const { readApprovalTeal, readClearTeal } = require('./compile');
 
 setup();
 
 async function setup() {
         // Setup AlgodClient Connection
         const algodToken = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+        // const algodServer = 'http://3.145.206.208';
         const algodServer = 'http://3.145.206.208';
         const algodPort = 4001;
         let algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
@@ -17,31 +19,41 @@ async function setup() {
     
 // get node suggested parameters (sp)
 let suggestedParams = await algodClient.getTransactionParams().do();
-suggestedParams.fee =500000;
+suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
 suggestedParams.flatFee = true;
-let index = 100326542;
+let index = 107308165;
 let token_address = 81317600;  
-let _origin = "V4RFEEPLSXDFQ22Q45Q47ZZN5IWUQRAQTFI5N6JR3UOLHLD3UYPORMRALY";
-account = [_origin, "GAJPADR5Y3ESQMP2LRGYKEADLBW6HXS5E3MDTQ7PCQS76EZTFJ4ZYH2VIE", "RPWOPFEMNLC3H3KMU7W6T2FJ637RD5TF4X46DM5ECZPQRECUTGXM57YEIE", "HFYC6SVT5MJIR7A5JFA5EIINDS43RX4RU4WXMJPKLLALNMKAI4HIDRED3I"];
+
+account = [];
 foreignApp = [];
 foreignAssets = [];
-foreignAssets.push(token_address);
+foreignAssets.push(token_address);  
+let bridge_fee = 0.0025 * 10000; // bridge_fee
+let token_buffer = 500;
 
-let action = "distribute-tax-avoid-origin";
 let appArgs = [];
-appArgs.push(new Uint8Array(Buffer.from(action)));
+appArgs.push(algosdk.encodeUint64(bridge_fee));
 appArgs.push(algosdk.encodeUint64(token_address));
+appArgs.push(algosdk.encodeUint64(token_buffer));
+
+        // Get ByteCode of Approval Program
+        let approvalProgram = await readApprovalTeal();
+        // console.log("Approval Program ByteCode: ",approvalProgram);    
+    
+            // Get ByteCode of ClearState Program
+        let clearProgram = await readClearTeal();
+        // console.log("Clear Program ByteCode: ",clearProgram);
 
 // create unsigned transaction
-let txn = algosdk.makeApplicationNoOpTxn(sender, suggestedParams, index, appArgs, account, foreignApp, foreignAssets);
+let txn = algosdk.makeApplicationUpdateTxn(sender, suggestedParams, index, approvalProgram, clearProgram);
 
 // get tx ID
 let txId = txn.txID().toString();
-console.log("setup Tx ID: ", txId);
+console.log("Update Tx ID: ", txId);
 
 // sign transaction 
 let signedTxn = txn.signTxn(creatorAccount.sk);
-console.log("setup signed Txn: ", signedTxn);
+console.log("Update signed Txn: ", signedTxn);
 
 // submit the transaction 
 let response = await algodClient.sendRawTransaction(signedTxn).do();
@@ -52,7 +64,7 @@ let timeout = 4;
 await waitForConfirmation(algodClient, txId, timeout);
 
 // response display 
-let txResponse = await algodClient.pendingTransactionInformation(txId).do();
-console.log("Setup Contract [App-ID]: ", txResponse['txn']['txn']['apid'] );
+let appId = response['txn']['txn'].apid;
+console.log("Updated app-id: ",appId);
 
 }

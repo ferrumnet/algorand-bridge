@@ -6,6 +6,7 @@ setup();
 async function setup() {
         // Setup AlgodClient Connection
         const algodToken = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+        // const algodServer = 'http://3.145.206.208';
         const algodServer = 'http://3.145.206.208';
         const algodPort = 4001;
         let algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
@@ -19,7 +20,7 @@ async function setup() {
 let suggestedParams = await algodClient.getTransactionParams().do();
 suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
 suggestedParams.flatFee = true;
-let index = 100446236;
+let index = 107308165;
 let token_address = 81317600;  
 
 account = [];

@@ -32,7 +32,7 @@ async function deployContract(){
     // let _weights = 2;
 
     let _global_len = 3;
-    let _global_totalW = 4;
+    let _global_totalW = 3;
     // let _global_weights = 3;
 
     // let _target_type = "address";
@@ -54,6 +54,7 @@ async function deployContract(){
     localBytes = 2;
     globalInts = 30;
     globalBytes = 30;
+
 
         // Get ByteCode of Approval Program
     let approvalProgram = await readApprovalTeal();

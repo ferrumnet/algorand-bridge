@@ -32,7 +32,7 @@ async function noop() {
    
 //python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(79584368).to_bytes(8, 'big'))))"
 
-let index = 98492040;
+let index = 107308165;
 let token_address = 81317600;
 let revocationTarget = undefined;
 let closeRemainderTo = undefined;
@@ -59,11 +59,11 @@ let txn = algosdk.makeApplicationNoOpTxn(sender, suggestedParams, index, appArgs
 
 // get tx ID
 let txId = txn.txID().toString();
-console.log("setup Tx ID: ", txId);
+console.log("target set Tx ID: ", txId);
 
 // sign transaction 
 let signedTxn = txn.signTxn(creatorAccount.sk);
-console.log("setup signed Txn: ", signedTxn);
+console.log("target set signed Txn: ", signedTxn);
 
 // submit the transaction 
 let response = await algodClient.sendRawTransaction(signedTxn).do();

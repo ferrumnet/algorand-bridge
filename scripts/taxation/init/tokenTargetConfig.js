@@ -19,7 +19,7 @@ async function setup() {
 let suggestedParams = await algodClient.getTransactionParams().do();
 suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
 suggestedParams.flatFee = true;
-let index = 100326542;
+let index = 107194846;
 let token_address = 81317600;  
 account = [];
 foreignApp = [];
