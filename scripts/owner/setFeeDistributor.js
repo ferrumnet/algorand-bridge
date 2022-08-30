@@ -10,20 +10,16 @@ async function noop() {
         const algodPort = 4001;
         let algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
 
-// ADMIN
-    let creatorMnemonic = "flight permit skill quick enforce strong hobby cloud letter foot can fee affair buddy exact link glare amused drama rain airport casual shoe abstract puppy";
-    let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
-    let sender = creatorAccount.addr;
+// // ADMIN
+//     let creatorMnemonic = "flight permit skill quick enforce strong hobby cloud letter foot can fee affair buddy exact link glare amused drama rain airport casual shoe abstract puppy";
+//     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
+//     let sender = creatorAccount.addr;
     
-// // Staker 1 
-// let userMnemonic = "bulk narrow warrior rally table smoke return pyramid drink sphere picnic rice manage village purse illegal problem trim arrange urban theme nerve dragon abstract chalk";
-// let userAccount = algosdk.mnemonicToSecretKey(userMnemonic);
-// let sender = userAccount.addr;
+// Owner 
+let creatorMnemonic = "bulk narrow warrior rally table smoke return pyramid drink sphere picnic rice manage village purse illegal problem trim arrange urban theme nerve dragon abstract chalk";
+let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
+let sender = creatorAccount.addr;
 
-// // Staker 2
-// let userMnemonic = "tackle illegal poverty push label proof vessel trial fee stem naive fatal muffin smart wink equip frost remove cup radar pilot awake flip above negative";
-// let userAccount = algosdk.mnemonicToSecretKey(userMnemonic);
-// let sender = userAccount.addr;
  
 // get node suggested parameters (sp)
     let suggestedParams = await algodClient.getTransactionParams().do();
@@ -32,20 +28,17 @@ async function noop() {
    
 //python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(79584368).to_bytes(8, 'big'))))"
 
-let index = 98492040;
+let index = 107308165;
 let token_address = 81317600;
-let revocationTarget = undefined;
-let closeRemainderTo = undefined;
-let note = undefined;
 
 // SmartContract address of FeeDistributro
-account = ["GAJPADR5Y3ESQMP2LRGYKEADLBW6HXS5E3MDTQ7PCQS76EZTFJ4ZYH2VIE"];
+account = ["L6QDYEA4FKKB23YDOFCKI6DK3BJYFYGWXMYUXR3B3MT6MCLG222J3IJGLY"];
 foreignApp = [];
 foreignAssets = [];
 foreignAssets.push(token_address);
 
 let action = "set-fee-distributor";
-// let feeDistributor = "RPWOPFEMNLC3H3KMU7W6T2FJ637RD5TF4X46DM5ECZPQRECUTGXM57YEIE";
+
 let appArgs = [];
 appArgs.push(new Uint8Array(Buffer.from(action)));
 // appArgs.push(new Uint8Array(Buffer.from(feeDistributor)));

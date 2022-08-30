@@ -2,7 +2,7 @@
 txn ApplicationID
 int 0
 ==
-bnz main_l30
+bnz main_l32
 txn OnCompletion
 int NoOp
 ==
@@ -17,69 +17,74 @@ int DeleteApplication
 bnz main_l5
 err
 main_l5:
-int 0
+int 1
 return
 main_l6:
-int 0
+int 1
 return
 main_l7:
 txna ApplicationArgs 0
 byte "setup"
 ==
-bnz main_l29
+bnz main_l31
 txna ApplicationArgs 0
 byte "add-signer"
 ==
-bnz main_l28
+bnz main_l30
 txna ApplicationArgs 0
 byte "remove-signer"
 ==
-bnz main_l27
+bnz main_l29
+txna ApplicationArgs 0
+byte "set-tax-app"
+==
+bnz main_l28
 txna ApplicationArgs 0
 byte "set-fee-distributor"
 ==
-bnz main_l26
+bnz main_l27
 txna ApplicationArgs 0
 byte "set-fee"
 ==
-bnz main_l25
+bnz main_l26
 txna ApplicationArgs 0
 byte "allow-target"
 ==
-bnz main_l24
+bnz main_l25
 txna ApplicationArgs 0
 byte "disallow-target"
 ==
-bnz main_l23
+bnz main_l24
 txna ApplicationArgs 0
 byte "add-liquidity"
 ==
-bnz main_l22
+bnz main_l23
 txna ApplicationArgs 0
 byte "remove-liquidity"
 ==
-bnz main_l21
+bnz main_l22
 txna ApplicationArgs 0
 byte "swap"
 ==
-bnz main_l20
+bnz main_l21
 txna ApplicationArgs 0
 byte "withdraw"
 ==
-bnz main_l19
+bnz main_l20
 err
-main_l19:
+main_l20:
 txna ApplicationArgs 1
-btoi
-txna ApplicationArgs 2
-btoi
-txn Sender
 txna ApplicationArgs 3
+txna ApplicationArgs 2
 txna ApplicationArgs 4
+txna ApplicationArgs 5
+txna ApplicationArgs 6
+txna ApplicationArgs 7
+txna ApplicationArgs 8
 callsub withdrawtoken_4
 int 1
 return
-main_l20:
+main_l21:
 txn Sender
 txna ApplicationArgs 1
 btoi
@@ -92,43 +97,20 @@ txna ApplicationArgs 5
 callsub swaptoken_3
 int 1
 return
-main_l21:
-txn Sender
-byte "application_admin"
-app_global_get
-==
-assert
-txna ApplicationArgs 1
-btoi
-txna ApplicationArgs 2
-btoi
-callsub removeliquidity_12
-int 1
-return
 main_l22:
-txn Sender
-byte "application_admin"
-app_global_get
-==
-assert
 txna ApplicationArgs 1
 btoi
 txna ApplicationArgs 2
 btoi
-callsub addliquidity_11
+callsub removeliquidity_13
 int 1
 return
 main_l23:
-txn Sender
-byte "application_admin"
-app_global_get
-==
-assert
 txna ApplicationArgs 1
 btoi
 txna ApplicationArgs 2
 btoi
-callsub disallowtarget_10
+callsub addliquidity_12
 int 1
 return
 main_l24:
@@ -141,8 +123,7 @@ txna ApplicationArgs 1
 btoi
 txna ApplicationArgs 2
 btoi
-txna ApplicationArgs 3
-callsub allowtarget_9
+callsub disallowtarget_11
 int 1
 return
 main_l25:
@@ -155,7 +136,8 @@ txna ApplicationArgs 1
 btoi
 txna ApplicationArgs 2
 btoi
-callsub setfee_8
+txna ApplicationArgs 3
+callsub allowtarget_10
 int 1
 return
 main_l26:
@@ -164,13 +146,37 @@ byte "application_admin"
 app_global_get
 ==
 assert
-txna Accounts 1
-callsub setfeedistributor_7
+txna ApplicationArgs 1
+btoi
+txna ApplicationArgs 2
+btoi
+callsub setfee_9
 int 1
 return
 main_l27:
 txn Sender
-byte "application_admin"
+byte "application_owner"
+app_global_get
+==
+assert
+txna Accounts 1
+callsub setfeedistributor_8
+int 1
+return
+main_l28:
+txn Sender
+byte "application_owner"
+app_global_get
+==
+assert
+txna ApplicationArgs 1
+btoi
+callsub settaxapp_7
+int 1
+return
+main_l29:
+txn Sender
+byte "application_owner"
 app_global_get
 ==
 assert
@@ -178,9 +184,9 @@ txna ApplicationArgs 1
 callsub removesigner_6
 int 1
 return
-main_l28:
+main_l30:
 txn Sender
-byte "application_admin"
+byte "application_owner"
 app_global_get
 ==
 assert
@@ -188,7 +194,7 @@ txna ApplicationArgs 1
 callsub addsigner_5
 int 1
 return
-main_l29:
+main_l31:
 txn Sender
 byte "application_admin"
 app_global_get
@@ -201,7 +207,7 @@ global CurrentApplicationAddress
 callsub executeassettransfer_1
 int 1
 return
-main_l30:
+main_l32:
 global GroupSize
 int 1
 ==
@@ -214,22 +220,29 @@ byte "token"
 txna ApplicationArgs 1
 btoi
 app_global_put
+byte "buffer"
+txna ApplicationArgs 2
+btoi
+app_global_put
 byte "application_admin"
 txn Sender
+app_global_put
+byte "application_owner"
+txna Accounts 1
 app_global_put
 int 1
 return
 
 // eth_ecdsa_recover
 ethecdsarecover_0:
-store 21
-store 20
-load 21
+store 26
+store 25
+load 26
 len
 int 65
 ==
 assert
-load 20
+load 25
 len
 int 32
 ==
@@ -237,9 +250,9 @@ assert
 int 2500
 int 10
 +
-store 22
+store 27
 ethecdsarecover_0_l1:
-load 22
+load 27
 global OpcodeBudget
 >
 bz ethecdsarecover_0_l3
@@ -255,19 +268,19 @@ itxn_field ClearStateProgram
 itxn_submit
 b ethecdsarecover_0_l1
 ethecdsarecover_0_l3:
-load 21
+load 26
 extract 32 32
 byte 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0
 b<=
 assert
-load 21
+load 26
 extract 64 1
 btoi
 int 27
 -
 int 0
 ==
-load 21
+load 26
 extract 64 1
 btoi
 int 27
@@ -276,21 +289,21 @@ int 1
 ==
 ||
 assert
-load 20
-load 21
+load 25
+load 26
 extract 64 1
 btoi
 int 27
 -
-load 21
+load 26
 extract 0 32
-load 21
+load 26
 extract 32 32
 ecdsa_pk_recover Secp256k1
-store 24
-store 23
-load 23
-load 24
+store 29
+store 28
+load 28
+load 29
 concat
 keccak256
 extract 12 20
@@ -389,89 +402,150 @@ retsub
 
 // withdraw_token
 withdrawtoken_4:
+store 19
+store 18
+store 17
 store 16
 store 15
 store 14
 store 13
 store 12
 load 13
+btoi
 int 0
 !=
 assert
+byte "signed_message"
 load 12
-itob
 load 14
 concat
 load 13
-itob
+concat
+load 17
 concat
 load 15
 concat
 keccak256
-store 19
-byte "signed_message"
-load 19
 app_global_put
 byte "signed_message"
 app_global_get
+load 18
+==
+assert
 byte "used_hash"
+byte "signed_message"
+app_global_get
 concat
 app_global_get
 int 1
 !=
 assert
+byte "msg_hash"
+load 19
+app_global_put
 byte "signer"
-byte "signed_message"
+byte "msg_hash"
 app_global_get
 load 16
 callsub ethecdsarecover_0
 app_global_put
+byte "used_hash"
 byte "signed_message"
 app_global_get
-byte "used_hash"
 concat
 int 1
 app_global_put
+byte "signers"
+byte "signer"
+app_global_get
+concat
+app_global_get
+int 1
+==
+assert
 load 13
-store 18
+btoi
+store 21
 load 13
+btoi
 load 12
-itob
 byte "fees"
 concat
 app_global_get
 *
 int 10000
 /
-store 17
-load 18
-load 17
+store 20
+load 21
+load 20
 -
-store 18
+store 21
 byte "tax"
-load 17
+load 20
 app_global_put
-load 17
+load 20
 int 0
 !=
-bz withdrawtoken_4_l2
+bnz withdrawtoken_4_l4
+withdrawtoken_4_l1:
+byte "fee_distributor"
+app_global_get
 load 12
-load 18
+btoi
+asset_holding_get AssetBalance
+store 24
+store 23
+load 24
+bz withdrawtoken_4_l5
+load 23
+store 22
+load 22
+byte "buffer"
+app_global_get
+>
+bz withdrawtoken_4_l5
+itxn_begin
+int appl
+itxn_field TypeEnum
+byte "tax_app"
+app_global_get
+itxn_field ApplicationID
+load 12
+btoi
+itxn_field Assets
+txna Accounts 1
+itxn_field Accounts
+txna Accounts 2
+itxn_field Accounts
+txna Accounts 3
+itxn_field Accounts
+int NoOp
+itxn_field OnCompletion
+byte "distribute-tax"
+itxn_field ApplicationArgs
+itxn_submit
+b withdrawtoken_4_l5
+withdrawtoken_4_l4:
+load 12
+btoi
+load 20
 byte "fee_distributor"
 app_global_get
 callsub executeassettransfer_1
-withdrawtoken_4_l2:
+b withdrawtoken_4_l1
+withdrawtoken_4_l5:
 load 12
-load 18
-load 14
+btoi
+load 21
+txn Sender
 callsub executeassettransfer_1
 retsub
 
 // add_signer
 addsigner_5:
-store 25
-load 25
+store 30
 byte "signers"
+load 30
 concat
 int 1
 app_global_put
@@ -479,169 +553,177 @@ retsub
 
 // remove_signer
 removesigner_6:
-store 26
-load 26
+store 31
 byte "signers"
+load 31
 concat
 app_global_del
 retsub
 
-// set_fee_distributor
-setfeedistributor_7:
-store 27
-byte "fee_distributor"
-load 27
-app_global_put
-retsub
-
-// set_fee
-setfee_8:
-store 29
-store 28
-load 29
-byte "bridge_fee"
-app_global_get
-<=
-assert
-load 28
-itob
-byte "fees"
-concat
-load 29
-app_global_put
-retsub
-
-// allow_target
-allowtarget_9:
+// set_tax_app
+settaxapp_7:
 store 32
-store 31
-store 30
-load 31
-int 0
->
-assert
-byte "allowed_targets"
-load 30
-itob
-concat
-load 31
-itob
-concat
+byte "tax_app"
 load 32
 app_global_put
 retsub
 
-// disallow_target
-disallowtarget_10:
-store 34
+// set_fee_distributor
+setfeedistributor_8:
 store 33
+byte "fee_distributor"
+load 33
+app_global_put
+retsub
+
+// set_fee
+setfee_9:
+store 35
+store 34
+load 35
+byte "bridge_fee"
+app_global_get
+<=
+assert
 load 34
+itob
+byte "fees"
+concat
+load 35
+app_global_put
+retsub
+
+// allow_target
+allowtarget_10:
+store 38
+store 37
+store 36
+load 37
 int 0
 >
 assert
 byte "allowed_targets"
-load 33
+load 36
 itob
 concat
-load 34
+load 37
+itob
+concat
+load 38
+app_global_put
+retsub
+
+// disallow_target
+disallowtarget_11:
+store 40
+store 39
+load 40
+int 0
+>
+assert
+byte "allowed_targets"
+load 39
+itob
+concat
+load 40
 itob
 concat
 app_global_del
 retsub
 
 // add_liquidity
-addliquidity_11:
-store 36
-store 35
-load 36
+addliquidity_12:
+store 42
+store 41
+load 42
 int 0
 !=
 assert
-load 35
-load 36
+load 41
+load 42
 callsub isassettransfered_2
 byte "liquidities"
-load 35
+load 41
 itob
 concat
 txn Sender
 concat
 byte "liquidities"
-load 35
+load 41
 itob
 concat
 txn Sender
 concat
 app_global_get
-load 36
+load 42
 +
 app_global_put
 retsub
 
 // remove_liquidity
-removeliquidity_12:
-store 38
-store 37
-load 38
+removeliquidity_13:
+store 44
+store 43
+load 44
 int 0
 !=
 assert
 byte "liquidities"
-load 37
+load 43
 itob
 concat
 txn Sender
 concat
 app_global_get
-store 39
-load 39
-load 38
+store 45
+load 45
+load 44
 >=
 assert
 global CurrentApplicationAddress
-load 37
-asset_holding_get AssetBalance
-store 43
-store 42
 load 43
+asset_holding_get AssetBalance
+store 49
+store 48
+load 49
 assert
-load 42
-store 41
-load 41
-load 38
+load 48
+store 47
+load 47
+load 44
 >
-bnz removeliquidity_12_l4
-load 41
-store 40
-removeliquidity_12_l2:
+bnz removeliquidity_13_l4
+load 47
+store 46
+removeliquidity_13_l2:
 byte "liquidities"
-load 37
+load 43
 itob
 concat
 txn Sender
 concat
 byte "liquidities"
-load 37
+load 43
 itob
 concat
 txn Sender
 concat
 app_global_get
-load 40
+load 46
 -
 app_global_put
-load 40
+load 46
 int 0
 !=
-bz removeliquidity_12_l5
-load 37
-load 40
+bz removeliquidity_13_l5
+load 43
+load 46
 txn Sender
 callsub executeassettransfer_1
-b removeliquidity_12_l5
-removeliquidity_12_l4:
-load 38
-store 40
-b removeliquidity_12_l2
-removeliquidity_12_l5:
+b removeliquidity_13_l5
+removeliquidity_13_l4:
+load 44
+store 46
+b removeliquidity_13_l2
+removeliquidity_13_l5:
 retsub

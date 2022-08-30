@@ -6,11 +6,12 @@ def approval_program():
 # Global States
     bridge_fee = Bytes("bridge_fee")
     token = Bytes("token")
+    buffer = Bytes("buffer")
     signer = Bytes("signer")
-    target_network = Bytes("target_network")
+    tax_app = Bytes("tax_app")
     target_token = Bytes("target_token")
-    target_address = Bytes("target_address")
     application_admin = Bytes("application_admin")
+    application_owner = Bytes("application_owner")
 
 # Global States Mapping
     signers = Bytes("signers")
@@ -19,6 +20,7 @@ def approval_program():
     fees = Bytes("fees")
     tax = Bytes("tax")
     used_hash = Bytes("used_hash")
+    msg_hash = Bytes("msg_hash")
     signed_message = Bytes("signed_message")
     allowed_targets = Bytes("allowed_targets")
 
@@ -74,59 +76,85 @@ def approval_program():
         ])
 
     @Subroutine(TealType.none)
-    def withdraw_token(token, amount, payee, salt, signature):
+    def withdraw_token(token, amount, payee, salt, signature, algo_chain_id, msg, msgHash):
         # Scratch Variables
         fee = ScratchVar(TealType.uint64)
         token_amount = ScratchVar(TealType.uint64)
-        message = ScratchVar(TealType.bytes)
+        balance = ScratchVar(TealType.uint64)
         return Seq([
-            Assert(amount != Int(0)),
-
-            # chain ID of algorand in signed Message 
-            message.store(Keccak256(Concat(Itob(token), payee, Itob(amount), salt))),
-            # message.store(Keccak256(salt)),
-            App.globalPut(signed_message, message.load()),
+            Assert(Btoi(amount) != Int(0)),
+            
+            App.globalPut(signed_message, Keccak256(Concat(token, payee, amount, algo_chain_id, salt))),
+            Assert(App.globalGet(signed_message) == msg),
 
             # require(!usedHashes[signed_message], "Message already used");
             # If signed_message exist in (used_hash) returns 1 
             # then stop tx as signed_message is already used
-            Assert(App.globalGet(Concat(App.globalGet(signed_message), used_hash)) != Int(1)),
+            Assert(App.globalGet(Concat(used_hash, App.globalGet(signed_message))) != Int(1)),
 
-            # App.globalPut(signer, eth_ecdsa_recover(App.globalGet(signed_message), signature)),
-            App.globalPut(signer, eth_ecdsa_recover(App.globalGet(signed_message), signature)),
+            App.globalPut(msg_hash, msgHash),
+            App.globalPut(signer, eth_ecdsa_recover(App.globalGet(msg_hash), signature)),
 
             # usedHashes[signed_message] = true;
             # Since the signed_messaged is used now add it to 
             # used_hash array as True. 
-            App.globalPut(Concat(App.globalGet(signed_message), used_hash), Int(1)),
+            App.globalPut(Concat(used_hash, App.globalGet(signed_message)), Int(1)),
 
             # Verify if the signer exist           
-            # Assert(App.globalGet(Concat(App.globalGet(signer), signers)) != Int(0)),
+            Assert(App.globalGet(Concat(signers, App.globalGet(signer))) == Int(1)),
 
             # Logic of Tax distribution
-            token_amount.store(amount),
-            fee.store(amount * App.globalGet(Concat(Itob(token), fees)) / Int(10000)),
+            token_amount.store(Btoi(amount)),
+            fee.store(Btoi(amount) * App.globalGet(Concat(token, fees)) / Int(10000)),
             token_amount.store(token_amount.load() - fee.load()),
             App.globalPut(tax, fee.load()),
             If( fee.load() != Int(0),
-                execute_asset_transfer(token, token_amount.load(), App.globalGet(fee_distributor)),
+                execute_asset_transfer(Btoi(token), fee.load(), App.globalGet(fee_distributor)),
                 #  IGeneralTaxDistributor(_feeDistributor).distributeTax(token);
             ),
+
+            holding := AssetHolding.balance(App.globalGet(fee_distributor), Btoi(token)),
+            If(holding.hasValue(),
+                Seq(
+                    balance.store(holding.value()),
+
+                    If(balance.load() > App.globalGet(buffer),
+                        Seq(
+                            InnerTxnBuilder.Begin(),
+                            InnerTxnBuilder.SetFields({
+                                TxnField.type_enum: TxnType.ApplicationCall,
+                                TxnField.application_id: App.globalGet(tax_app),
+                                TxnField.assets: [Btoi(token)],
+                                TxnField.accounts: [Txn.accounts[1], Txn.accounts[2], Txn.accounts[3]],
+                                TxnField.on_completion: OnComplete.NoOp,
+                                TxnField.application_args: [Bytes("distribute-tax")],
+                            }),
+                            InnerTxnBuilder.Submit(),
+                        ),
+                    ),
+                ),
+            ),
             # Withdraw tokens to the Aglorand receiver
-            execute_asset_transfer(token, token_amount.load(), payee)
+            execute_asset_transfer(Btoi(token), token_amount.load(), Txn.sender()),
         ])
 
     @Subroutine(TealType.none)
     def add_signer(_signer):
         return Seq([
-        App.globalPut(Concat(_signer, signers), Int(1))
+        App.globalPut(Concat(signers, _signer), Int(1))
     ])
 
     @Subroutine(TealType.none)
     def remove_signer(_signer):
         return Seq([
         # App.globalPut(Concat(_signer, signers), Int(0))
-        App.globalDel(Concat(_signer, signers)),
+        App.globalDel(Concat(signers, _signer)),
+    ])
+
+    @Subroutine(TealType.none)
+    def set_tax_app(app_id):
+        return Seq([
+        App.globalPut(tax_app, app_id)
     ])
 
     @Subroutine(TealType.none)
@@ -210,14 +238,20 @@ def approval_program():
     # CONSTRUCTOR
     _bridge_fee = Btoi(Txn.application_args[0])
     _token = Btoi(Txn.application_args[1])
+    _buffer = Btoi(Txn.application_args[2])
     on_creation = Seq(
         Assert(Global.group_size() == Int(1)),
         App.globalPut(bridge_fee, _bridge_fee),
         App.globalPut(token, _token),
+        App.globalPut(buffer, _buffer),
         App.globalPut(application_admin, Txn.sender()),
+        App.globalPut(application_owner, Txn.accounts[1]),
         Approve(),
     )
+
     is_application_admin = Assert(Txn.sender() == App.globalGet(application_admin))
+    is_application_owner = Assert(Txn.sender() == App.globalGet(application_owner))
+
     on_setup = Seq(
         is_application_admin,
         # OPT-IN to Token from Application. 
@@ -237,37 +271,45 @@ def approval_program():
         Approve(),
     ])
 
-    # eth_ecdsa_recover(Txn.application_args[0], Txn.application_args[1])
-
-    _token = Btoi(Txn.application_args[1])
-    _amount = Btoi(Txn.application_args[2])
-    _salt = Txn.application_args[3]
-    _signature = Txn.application_args[4]
+    _token = Txn.application_args[1]
+    _payee = Txn.application_args[2]
+    _amount = Txn.application_args[3]
+    _salt = Txn.application_args[4]
+    _signature = Txn.application_args[5]
+    algo_chain_id = Txn.application_args[6]
+    msg = Txn.application_args[7]
+    msgHash = Txn.application_args[8]
     # Method WITHDRAW
     on_withdraw = Seq([
-        # is_application_admin,
-        withdraw_token(_token, _amount, Txn.sender(), _salt, _signature),
+        withdraw_token(_token, _amount, _payee, _salt, _signature, algo_chain_id, msg, msgHash),
         Approve(),
     ])
 
 # Owner Only operations
     _signer_address = Txn.application_args[1]
     on_add_signer = Seq([
-        is_application_admin,
+        is_application_owner,
         add_signer(_signer_address),
         Approve(),
     ])
 
     _signer_address = Txn.application_args[1]
     on_remove_signer = Seq([
-        is_application_admin,
+        is_application_owner,
         remove_signer(_signer_address),
+        Approve(),
+    ])
+
+    _app_id = Btoi(Txn.application_args[1])
+    on_set_tax_app = Seq([
+        is_application_owner,
+        set_tax_app(_app_id),
         Approve(),
     ])
 
     _fee_distributor = Txn.accounts[1]
     on_set_fee_distributor = Seq([
-        is_application_admin,
+        is_application_owner,
         set_fee_distributor(_fee_distributor),
         Approve(),
     ])
@@ -298,10 +340,10 @@ def approval_program():
         Approve(),
     ])
 
+# User Operations
     _token = Btoi(Txn.application_args[1])
     _amount = Btoi(Txn.application_args[2])
     on_add_liquidity = Seq([
-        is_application_admin,
         add_liquidity(_token, _amount),
         Approve(),
     ])
@@ -309,7 +351,6 @@ def approval_program():
     _token = Btoi(Txn.application_args[1])
     _amount = Btoi(Txn.application_args[2])
     on_remove_liquidity = Seq([
-        is_application_admin,
         remove_liquidity(_token, _amount),
         Approve(),
     ])
@@ -320,6 +361,7 @@ def approval_program():
 # Owner Only operations
         [on_call_method == Bytes("add-signer"), on_add_signer],
         [on_call_method == Bytes("remove-signer"), on_remove_signer],
+        [on_call_method == Bytes("set-tax-app"), on_set_tax_app],
         [on_call_method == Bytes("set-fee-distributor"), on_set_fee_distributor],
 # Admin operations 
         [on_call_method == Bytes("set-fee"), on_set_fee],
@@ -337,10 +379,10 @@ def approval_program():
         [on_call_method == Bytes("withdraw"), on_withdraw]
     )
     on_delete = Seq([ 
-        Reject(),
+        Approve(),
     ])
     on_update = Seq([ 
-        Reject(),
+        Approve(),
     ])
 
     program = Cond(

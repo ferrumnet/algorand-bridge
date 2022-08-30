@@ -22,7 +22,7 @@ const { default: algosdk } = require('algosdk');
     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
     let sender = creatorAccount.addr;
 
-let index = 98492040;
+let index = 107308165;
 
 // to read local state of user account
 readLocalState(algodClient, sender, index);

@@ -32,11 +32,26 @@ contract GeneralTaxDistributorDiscrete {
     }
 
     struct TargetInfo {
-        address tgt;
-        TargetType tType;
+        address tgt;  
+        TargetType tType;  
     }
-    mapping(address => TokenInfo) public tokenInfo;
+    mapping(address => TokenInfo) public tokenInfo;   
+    // tokenInfo[token] = ti.bufferSize/tokenConfig;
+
     mapping(address => TargetConfig) public tokenTargetConfigs;
+
+    TargetInfo[] public targetInfos;
+
+
+    mapping(address => TargetInfo[]) public tokenTargetInfos;  
+    
+
+    // tokenTargetInfo[token] --> {targetAddress, burn, targetAddress, address}
+
+    // mapping(address (token) => target_address) tgt_address;
+    // mapping(address(token) => target_type {burn, address, notSet}) token_target_type_info;
+
+    // TargetINFO[] => { tgt_address, burn}, {tgt_address, address}, {tgt_address, notSet}
 
     TargetConfig public globalTargetConfig;
 
@@ -68,6 +83,7 @@ contract GeneralTaxDistributorDiscrete {
         TargetConfig memory target = ti.tokenSpecificConfig != 0
             ? tokenTargetConfigs[token]
             : globalTargetConfig;
+            
         if (target.len == 0) {
             ti.tokenSpecificConfig = 0;
             target = globalTargetConfig;
@@ -75,13 +91,15 @@ contract GeneralTaxDistributorDiscrete {
 
         uint256 remaining = balance;
         uint256 w = target.weights;
+
         for (uint8 i = 0; i < target.len; i++) {
             uint8 mi = 8 * i;
-            uint256 mask = 0xff << mi;
-            uint256 poolRatio = mask & w;
+            uint256 mask = 0xff << mi;  // 
+            uint256 poolRatio = mask & w; 
             poolRatio = poolRatio >> mi;
 
             uint256 amount = poolRatio * balance / target.totalW;
+
             if (remaining > amount) {
                 remaining -= amount;
             } else {

@@ -1,6 +1,7 @@
 const { waitForConfirmation,ALGORAND_MIN_TX_FEE, default: algosdk } = require('algosdk');
 // require('./deploy.js');
-const EthCrypto = require('eth-crypto');
+const { readApprovalTeal, readClearTeal } = require('./compile');
+
 setup();
 
 async function setup() {
@@ -26,22 +27,33 @@ let token_address = 81317600;
 account = [];
 foreignApp = [];
 foreignAssets = [];
-foreignAssets.push(token_address);
+foreignAssets.push(token_address);  
+let bridge_fee = 0.0025 * 10000; // bridge_fee
+let token_buffer = 500;
 
-let action = "setup";
 let appArgs = [];
-appArgs.push(new Uint8Array(Buffer.from(action)));
+appArgs.push(algosdk.encodeUint64(bridge_fee));
+appArgs.push(algosdk.encodeUint64(token_address));
+appArgs.push(algosdk.encodeUint64(token_buffer));
+
+        // Get ByteCode of Approval Program
+        let approvalProgram = await readApprovalTeal();
+        // console.log("Approval Program ByteCode: ",approvalProgram);    
+    
+            // Get ByteCode of ClearState Program
+        let clearProgram = await readClearTeal();
+        // console.log("Clear Program ByteCode: ",clearProgram);
 
 // create unsigned transaction
-let txn = algosdk.makeApplicationNoOpTxn(sender, suggestedParams, index, appArgs, account, foreignApp, foreignAssets);
+let txn = algosdk.makeApplicationUpdateTxn(sender, suggestedParams, index, approvalProgram, clearProgram);
 
 // get tx ID
 let txId = txn.txID().toString();
-console.log("setup Tx ID: ", txId);
+console.log("Update Tx ID: ", txId);
 
 // sign transaction 
 let signedTxn = txn.signTxn(creatorAccount.sk);
-console.log("setup signed Txn: ", signedTxn);
+console.log("Update signed Txn: ", signedTxn);
 
 // submit the transaction 
 let response = await algodClient.sendRawTransaction(signedTxn).do();
@@ -52,7 +64,7 @@ let timeout = 4;
 await waitForConfirmation(algodClient, txId, timeout);
 
 // response display 
-let txResponse = await algodClient.pendingTransactionInformation(txId).do();
-console.log("Setup Contract [App-ID]: ", txResponse['txn']['txn']['apid'] );
+let appId = response['txn']['txn'].apid;
+console.log("Updated app-id: ",appId);
 
 }

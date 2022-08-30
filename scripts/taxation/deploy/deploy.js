@@ -14,10 +14,6 @@ async function deployContract(){
     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
     let sender = creatorAccount.addr;
 
-// // Staker 2
-// let creatorMnemonic = "tackle illegal poverty push label proof vessel trial fee stem naive fatal muffin smart wink equip frost remove cup radar pilot awake flip above negative";
-// let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
-// let sender = creatorAccount.addr;
         // Setup AlgodClient Connection
         const algodToken = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
         const algodServer = 'http://3.145.206.208';
@@ -28,30 +24,37 @@ async function deployContract(){
     let suggestedParams = await algodClient.getTransactionParams().do();
     suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
     suggestedParams.flatFee = true;
-            let token_address = 81317600;    
-            let bridge_fee = 0.0025 * 10000; // bridge_fee
-            let token_buffer = 500;
+    let token_address = 81317600;    
             
 // python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(93217615).to_bytes(8, 'big'))))"
+    // let _len = 2;
+    // let _totalW = 3;
+    // let _weights = 2;
 
+    let _global_len = 3;
+    let _global_totalW = 3;
+    // let _global_weights = 3;
+
+    // let _target_type = "address";
 
             let appArgs = [];
 
-            appArgs.push(algosdk.encodeUint64(bridge_fee));
             appArgs.push(algosdk.encodeUint64(token_address));
-            appArgs.push(algosdk.encodeUint64(token_buffer));
+            appArgs.push(algosdk.encodeUint64(_global_len));
+            appArgs.push(algosdk.encodeUint64(_global_totalW));
+            // appArgs.push(algosdk.encodeUint64(_global_weights));
 
-            let owner = "GAJPADR5Y3ESQMP2LRGYKEADLBW6HXS5E3MDTQ7PCQS76EZTFJ4ZYH2VIE";
-            accounts = [owner];
+            accounts = [];
             foreignApps = [];
             foreignAssets = [];
             foreignAssets.push(token_address);
 
     // declare application state storage (immutable)
-    localInts = 1;
-    localBytes = 1;
-    globalInts = 20;
-    globalBytes = 20;
+    localInts = 2;
+    localBytes = 2;
+    globalInts = 30;
+    globalBytes = 30;
+
 
         // Get ByteCode of Approval Program
     let approvalProgram = await readApprovalTeal();
