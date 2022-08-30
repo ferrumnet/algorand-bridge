@@ -15,18 +15,18 @@ async function noop() {
     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
     let sender = creatorAccount.addr;
     
-// // Staker 1 
-// let userMnemonic = "bulk narrow warrior rally table smoke return pyramid drink sphere picnic rice manage village purse illegal problem trim arrange urban theme nerve dragon abstract chalk";
-// let userAccount = algosdk.mnemonicToSecretKey(userMnemonic);
-// let sender = userAccount.addr;
+// // User 1 
+// let creatorMnemonic = "bulk narrow warrior rally table smoke return pyramid drink sphere picnic rice manage village purse illegal problem trim arrange urban theme nerve dragon abstract chalk";
+// let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
+// let sender = creatorAccount.addr;
 
-// // Staker 2
+// // User 2
 // let userMnemonic = "tackle illegal poverty push label proof vessel trial fee stem naive fatal muffin smart wink equip frost remove cup radar pilot awake flip above negative";
 // let userAccount = algosdk.mnemonicToSecretKey(userMnemonic);
 // let sender = userAccount.addr;
  
     // Contract Address
-    let smartContract = "YW77XHZMM5OMA6IJZ45S6J6NNWN7KXHWEPLJVMUS37BY4WAPG45OOWZW2E";
+    let smartContract = "ET3QWGXO5Z3HC55J7QXKBUWA2K75VZYRGUSB7YDSNO3ZNF254LKZMBQTIY";
 // get node suggested parameters (sp)
     let suggestedParams = await algodClient.getTransactionParams().do();
     suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
@@ -34,7 +34,7 @@ async function noop() {
    
 //python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(79584368).to_bytes(8, 'big'))))"
 
-let index = 100446236;
+let index = 107308165;
 let token_address = 81317600;
 let revocationTarget = undefined;
 let closeRemainderTo = undefined;
@@ -45,7 +45,7 @@ foreignAssets = [];
 foreignAssets.push(token_address);
 
 let action = "add-liquidity";
-let amount = 1000;
+let amount = 2000;
 
 let appArgs = [];
 appArgs.push(new Uint8Array(Buffer.from(action)));

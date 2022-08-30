@@ -89,18 +89,37 @@ def approval_program():
             App.globalPut(Concat(target_info, target), target_type),
         ])
 
+
     @Subroutine(TealType.none)
-    def distribute_tax(token, origin):
+    def distribute_tax_Direct(token):
+        return distribute_tax_non_Random(token, token)
+
+    @Subroutine(TealType.none)
+    def distribute_tax_avoid_origin(token, origin):
+        return distribute_tax_non_Random(token, origin)
+
+
+    @Subroutine(TealType.none)
+    def distribute_tax_non_Random(token, origin):
         amount = ScratchVar(TealType.uint64)
         balance = ScratchVar(TealType.uint64)
         remaining = ScratchVar(TealType.uint64)
         w = ScratchVar(TealType.uint64)
         i = ScratchVar(TealType.uint64)
         count = ScratchVar(TealType.uint64)
+        mask = ScratchVar(TealType.uint64)
+        poolRatio = ScratchVar(TealType.uint64)
         token_specific_config_val = ScratchVar(TealType.uint64)
         config = ScratchVar(TealType.uint64)
         tokenBufferSize = ScratchVar(TealType.uint64)
         return Seq([
+            # Check balance, if less than buffer
+            # TokenInfo memory ti = tokenInfo[token];
+
+            # uint256 balance = IERC20(token).balanceOf(address(this));
+            # if (balance < ti.bufferSize) {
+            #     return 0;
+            # }
             holding := AssetHolding.balance(Global.current_application_address(), token),
             Assert(holding.hasValue()),
             balance.store(holding.value()),
@@ -109,6 +128,10 @@ def approval_program():
             If(balance.load() < tokenBufferSize.load(),
                 Reject(),
             ),
+
+            # TargetConfig memory target = ti.tokenSpecificConfig != 0
+            #     ? tokenTargetConfigs[token]
+            #     : globalTargetConfig;
 
             config.store(App.globalGet(Concat(token_specific_config, Itob(token)))),
             If(config.load() != Int(0))
@@ -158,11 +181,16 @@ def approval_program():
                 For(i.store(Int(0)), i.load() < App.globalGet(target_len), i.store(i.load() + Int(1))).Do(
                     Seq(
                         w.store(App.globalGet(Concat(target_weights, Itob(i.load())))),
+                        # mi.store(Int(8) * i.load()),
+                        # mask.store(ShiftLeft(Int(255), mi.load())),
+                        # poolRatio.store(BitwiseAnd(mask.load(), w.load())),
+                        # poolRatio.store(ShiftRight(poolRatio.load(), mi.load())),
 
+                       # targetAmount := moduleToken.Mul(sdk.NewInt(int64(target.Weight))).Quo(sdk.NewInt(int64(totalWeight)))
+                       # amount = balance * target.weight / total weight
                        amount.store(balance.load() * w.load() / App.globalGet(target_totalW)),
 
                         # amount = 1000 * 7/10 
-
 
                         If(remaining.load() > amount.load(),
                             remaining.store(remaining.load() - amount.load()),
@@ -206,9 +234,9 @@ def approval_program():
             If(targetAddress.load() == origin,
                 Reject(),
             ),
-            # If(targetType.load() == Bytes("burn"),
-            #     execute_asset_transfer(token, balance, Global.zero_address()),
-            # ),
+            If(targetType.load() == Bytes("burn"),
+                execute_asset_transfer(token, balance, Global.zero_address()),
+            ),
             If(targetType.load() == Bytes("address"),
                 execute_asset_transfer(token, balance, targetAddress.load()),
             ),
@@ -269,10 +297,6 @@ def approval_program():
         Approve(),
     )
     
-    on_distribute_tax = Seq(
-        distribute_tax(App.globalGet(token), Txn.sender()),
-        Approve(),
-    )
 
     is_application_admin = Assert(Txn.sender() == App.globalGet(application_admin))
     on_setup = Seq(
@@ -281,12 +305,27 @@ def approval_program():
         execute_asset_transfer(App.globalGet(token), Int(0), Global.current_application_address()),
         Approve(),
     )
+    _token = Btoi(Txn.application_args[1])
+    on_distribute_tax_Direct = Seq([d
+        # is_application_admin,
+        distribute_tax_Direct(_token),
+        Approve(),
+    ])
+
+    _token = Btoi(Txn.application_args[1])
+    _origin = Txn.application_args[2]
+    on_distribute_tax_avoid_origin = Seq([
+        # is_application_admin,
+        distribute_tax_avoid_origin(_token, _origin),
+        Approve(),
+    ])
 
     on_call_method = Txn.application_args[0]
     on_call = Cond(
         [on_call_method == Bytes("setup"), on_setup],
 # Owner Only operations
-        [on_call_method == Bytes("distribute-tax"), on_distribute_tax],
+        [on_call_method == Bytes("distribute-tax-direct"), on_distribute_tax_Direct],
+        [on_call_method == Bytes("distribute-tax-avoid-origin"), on_distribute_tax_avoid_origin],
 # Init Values 
         [on_call_method == Bytes("token-info"), on_init_token_info],
         [on_call_method == Bytes("global-target-weight"), on_init_global_target_weights], 
@@ -298,7 +337,7 @@ def approval_program():
         Approve(),
     ])
     on_update = Seq([ 
-        Approve(),
+        Reject(),
     ])
 
     program = Cond(
