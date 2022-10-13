@@ -1,0 +1,561 @@
+#pragma version 6
+txn ApplicationID
+int 0
+==
+bnz main_l22
+txn OnCompletion
+int NoOp
+==
+bnz main_l7
+txn OnCompletion
+int UpdateApplication
+==
+bnz main_l6
+txn OnCompletion
+int DeleteApplication
+==
+bnz main_l5
+err
+main_l5:
+int 0
+return
+main_l6:
+int 1
+return
+main_l7:
+txna ApplicationArgs 0
+byte "setup"
+==
+bnz main_l21
+txna ApplicationArgs 0
+byte "distribute-tax"
+==
+bnz main_l20
+txna ApplicationArgs 0
+byte "token-info"
+==
+bnz main_l19
+txna ApplicationArgs 0
+byte "global-target-weight"
+==
+bnz main_l18
+txna ApplicationArgs 0
+byte "token-target-config"
+==
+bnz main_l17
+txna ApplicationArgs 0
+byte "target-info"
+==
+bnz main_l16
+txna ApplicationArgs 0
+byte "token-target-info"
+==
+bnz main_l15
+err
+main_l15:
+txna ApplicationArgs 1
+btoi
+txna Accounts 1
+txna ApplicationArgs 2
+txna ApplicationArgs 4
+btoi
+txna ApplicationArgs 3
+btoi
+callsub inittokentargetinfo_5
+int 1
+return
+main_l16:
+txna Accounts 1
+txna ApplicationArgs 1
+txna ApplicationArgs 2
+btoi
+callsub inittargetinfo_6
+int 1
+return
+main_l17:
+txna ApplicationArgs 1
+btoi
+txna ApplicationArgs 2
+btoi
+txna ApplicationArgs 3
+btoi
+callsub inittokentargetconfig_2
+int 1
+return
+main_l18:
+txna ApplicationArgs 2
+btoi
+txna ApplicationArgs 1
+btoi
+callsub initglobaltargetweights_4
+int 1
+return
+main_l19:
+txna ApplicationArgs 1
+btoi
+txna ApplicationArgs 2
+btoi
+txna ApplicationArgs 3
+btoi
+callsub inittokeninfo_1
+int 1
+return
+main_l20:
+byte "token"
+app_global_get
+txn Sender
+callsub distributetax_7
+int 1
+return
+main_l21:
+txn Sender
+byte "application_admin"
+app_global_get
+==
+assert
+byte "token"
+app_global_get
+int 0
+global CurrentApplicationAddress
+callsub executeassettransfer_0
+int 1
+return
+main_l22:
+global GroupSize
+int 1
+==
+assert
+byte "token"
+txna ApplicationArgs 0
+btoi
+app_global_put
+byte "application_admin"
+txn Sender
+app_global_put
+txna ApplicationArgs 1
+btoi
+txna ApplicationArgs 2
+btoi
+callsub initglobaltargetconfig_3
+int 1
+return
+
+// execute_asset_transfer
+executeassettransfer_0:
+store 2
+store 1
+store 0
+itxn_begin
+int axfer
+itxn_field TypeEnum
+load 0
+itxn_field XferAsset
+load 1
+itxn_field AssetAmount
+load 2
+itxn_field AssetReceiver
+int 0
+itxn_field Fee
+itxn_submit
+retsub
+
+// init_token_info
+inittokeninfo_1:
+store 5
+store 4
+store 3
+byte "token_buffer"
+load 3
+itob
+concat
+load 4
+app_global_put
+byte "token_specific_config"
+load 3
+itob
+concat
+load 5
+app_global_put
+retsub
+
+// init_token_target_config
+inittokentargetconfig_2:
+store 8
+store 7
+store 6
+byte "token_target_len"
+load 6
+itob
+concat
+load 7
+app_global_put
+byte "token_target_totalW"
+load 6
+itob
+concat
+load 8
+app_global_put
+retsub
+
+// init_global_target_config
+initglobaltargetconfig_3:
+store 10
+store 9
+byte "global_target_len"
+load 9
+app_global_put
+byte "global_target_totalW"
+load 10
+app_global_put
+retsub
+
+// init_global_target_weights
+initglobaltargetweights_4:
+store 12
+store 11
+byte "global_target_weights"
+load 12
+itob
+concat
+load 11
+app_global_put
+retsub
+
+// init_token_target_info
+inittokentargetinfo_5:
+store 17
+store 16
+store 15
+store 14
+store 13
+byte "token_target_info"
+load 13
+itob
+concat
+load 17
+itob
+concat
+load 14
+app_global_put
+byte "token_target_info"
+load 13
+itob
+concat
+load 14
+concat
+load 15
+app_global_put
+byte "token_target_weights"
+load 13
+itob
+concat
+load 17
+itob
+concat
+load 16
+app_global_put
+retsub
+
+// init_target_info
+inittargetinfo_6:
+store 20
+store 19
+store 18
+byte "target_info"
+load 20
+itob
+concat
+load 18
+app_global_put
+byte "target_info"
+load 18
+concat
+load 19
+app_global_put
+retsub
+
+// distribute_tax
+distributetax_7:
+store 22
+store 21
+global CurrentApplicationAddress
+load 21
+asset_holding_get AssetBalance
+store 33
+store 32
+load 33
+assert
+load 32
+store 24
+byte "token_buffer"
+load 21
+itob
+concat
+app_global_get
+store 31
+load 24
+load 31
+<
+bnz distributetax_7_l20
+byte "token_specific_config"
+load 21
+itob
+concat
+app_global_get
+store 30
+load 30
+int 0
+!=
+bnz distributetax_7_l17
+byte "target_len"
+byte "global_target_len"
+app_global_get
+app_global_put
+byte "target_totalW"
+byte "global_target_totalW"
+app_global_get
+app_global_put
+int 0
+store 28
+int 0
+store 28
+distributetax_7_l3:
+load 28
+byte "target_len"
+app_global_get
+<
+bnz distributetax_7_l16
+distributetax_7_l4:
+byte "target_len"
+app_global_get
+int 0
+==
+bnz distributetax_7_l13
+distributetax_7_l5:
+byte "token_specific_config"
+load 21
+itob
+concat
+app_global_get
+store 29
+load 24
+store 25
+int 0
+store 27
+int 0
+store 27
+distributetax_7_l6:
+load 27
+byte "target_len"
+app_global_get
+<
+bz distributetax_7_l21
+byte "target_weights"
+load 27
+itob
+concat
+app_global_get
+store 26
+load 24
+load 26
+*
+byte "target_totalW"
+app_global_get
+/
+store 23
+load 25
+load 23
+>
+bnz distributetax_7_l12
+load 25
+store 23
+distributetax_7_l9:
+load 23
+int 0
+!=
+bnz distributetax_7_l11
+distributetax_7_l10:
+load 27
+int 1
++
+store 27
+b distributetax_7_l6
+distributetax_7_l11:
+load 27
+load 29
+load 21
+load 22
+load 23
+callsub distributetotarget_8
+b distributetax_7_l10
+distributetax_7_l12:
+load 25
+load 23
+-
+store 25
+b distributetax_7_l9
+distributetax_7_l13:
+byte "token_specific_config"
+load 21
+itob
+concat
+int 0
+app_global_put
+byte "target_len"
+byte "global_target_len"
+app_global_get
+app_global_put
+byte "target_totalW"
+byte "global_target_totalW"
+app_global_get
+app_global_put
+int 0
+store 28
+int 0
+store 28
+distributetax_7_l14:
+load 28
+byte "target_len"
+app_global_get
+<
+bz distributetax_7_l5
+byte "target_weights"
+load 28
+itob
+concat
+byte "global_target_weights"
+load 28
+itob
+concat
+app_global_get
+app_global_put
+load 28
+int 1
++
+store 28
+b distributetax_7_l14
+distributetax_7_l16:
+byte "target_weights"
+load 28
+itob
+concat
+byte "global_target_weights"
+load 28
+itob
+concat
+app_global_get
+app_global_put
+load 28
+int 1
++
+store 28
+b distributetax_7_l3
+distributetax_7_l17:
+byte "target_len"
+byte "token_target_len"
+load 21
+itob
+concat
+app_global_get
+app_global_put
+byte "target_totalW"
+byte "token_target_totalW"
+load 21
+itob
+concat
+app_global_get
+app_global_put
+int 0
+store 28
+int 0
+store 28
+distributetax_7_l18:
+load 28
+byte "target_len"
+app_global_get
+<
+bz distributetax_7_l4
+byte "target_weights"
+load 28
+itob
+concat
+byte "token_target_weights"
+load 21
+itob
+concat
+load 28
+itob
+concat
+app_global_get
+app_global_put
+load 28
+int 1
++
+store 28
+b distributetax_7_l18
+distributetax_7_l20:
+int 0
+return
+distributetax_7_l21:
+retsub
+
+// distribute_to_target
+distributetotarget_8:
+store 38
+store 37
+store 36
+store 35
+store 34
+load 35
+int 0
+!=
+bnz distributetotarget_8_l6
+byte "target_info"
+load 34
+itob
+concat
+app_global_get
+store 40
+byte "target_info"
+load 40
+concat
+app_global_get
+store 39
+distributetotarget_8_l2:
+load 40
+load 37
+==
+bnz distributetotarget_8_l5
+load 39
+byte "address"
+==
+bz distributetotarget_8_l7
+load 36
+load 38
+load 40
+callsub executeassettransfer_0
+b distributetotarget_8_l7
+distributetotarget_8_l5:
+int 0
+return
+distributetotarget_8_l6:
+byte "token_target_info"
+load 36
+itob
+concat
+load 34
+itob
+concat
+app_global_get
+store 40
+byte "token_target_info"
+load 36
+itob
+concat
+load 40
+concat
+app_global_get
+store 39
+b distributetotarget_8_l2
+distributetotarget_8_l7:
+retsub
