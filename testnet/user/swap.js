@@ -10,20 +10,10 @@ async function noop() {
         const algodPort = 4001;
         let algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
 
-// // ADMIN
-//     let userMnemonic = "flight permit skill quick enforce strong hobby cloud letter foot can fee affair buddy exact link glare amused drama rain airport casual shoe abstract puppy";
-//     let userAccount = algosdk.mnemonicToSecretKey(userMnemonic);
-//     let sender = userAccount.addr;
-    
 // User 1 
-let userMnemonic = "bulk narrow warrior rally table smoke return pyramid drink sphere picnic rice manage village purse illegal problem trim arrange urban theme nerve dragon abstract chalk";
+let userMnemonic = "Enter your Mnemonics here to execute the script";
 let userAccount = algosdk.mnemonicToSecretKey(userMnemonic);
 let sender = userAccount.addr;
-
-// // // User 2
-// let userMnemonic = "tackle illegal poverty push label proof vessel trial fee stem naive fatal muffin smart wink equip frost remove cup radar pilot awake flip above negative";
-// let userAccount = algosdk.mnemonicToSecretKey(userMnemonic);
-// let sender = userAccount.addr;
 
     // Contract Address
     let smartContract = "RDA7XTT6DSVQFUHKBYED4UBCRARFROMKQMLKEGISTC2FYYJ67XXJXHK3IM";
@@ -33,7 +23,6 @@ let sender = userAccount.addr;
     suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
     suggestedParams.flatFee = true;
    
-//python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(79584368).to_bytes(8, 'big'))))"
 
 let index = 114299206;
 let token_address = 81317600;

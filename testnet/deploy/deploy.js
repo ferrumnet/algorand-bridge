@@ -10,7 +10,7 @@ deployContract();
 async function deployContract(){
 
 // ADMIN
-    creatorMnemonic = "flight permit skill quick enforce strong hobby cloud letter foot can fee affair buddy exact link glare amused drama rain airport casual shoe abstract puppy";
+    creatorMnemonic = "Enter your Mnemonics here to execute the script";
     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
     let sender = creatorAccount.addr;
 
@@ -20,27 +20,27 @@ async function deployContract(){
     1. Mainnet Account (Admin)
 
     Public Key: YOGAST2V4TKCQMNAVEJYIUNZDH5PKHWYED7QX6WLAE5PNTMNCIEESYY3SQ
-    Mnemonics: pink faint about build crime cause gossip leopard chat utility network mansion tunnel armed blue clean much claim switch unfold saddle victory know absent legend
+    Mnemonics: Enter your Mnemonics here to execute the script
 
     2. UserA 
 
     Public Key: LQOQ5NJTFGV6Z7O6TD5JCODOUJZUGJ43OLZ4IVZHJGQKPODS5EMP7JVKJ4
-    Mnemonics: oven visual long lunar bubble supply ozone coast gown auction service comic pink hockey scorpion announce bind cradle unfold siege play long vacuum absorb win
+    Mnemonics: Enter your Mnemonics here to execute the script
 
     3. UserB
     
     Public key: 247QELZSSP4IODWTIOS4GM7LSCLKFPVB3XR6BBUXG3VC45IDF2EJ3HW43E
-    Mnemonics: exclude cute joy nest rebel food amazing ship monster gift deny master rare chef ice length raccoon capable hair hamster genre gun style abandon daughter
+    Mnemonics: Enter your Mnemonics here to execute the script
     */
 
-// // Staker 2
-// let creatorMnemonic = "tackle illegal poverty push label proof vessel trial fee stem naive fatal muffin smart wink equip frost remove cup radar pilot awake flip above negative";
+// // Account 2
+// let creatorMnemonic = "Enter your Mnemonics here to execute the script";
 // let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
 // let sender = creatorAccount.addr;
 
 // https://mainnet-algorand.api.purestake.io/ps2
 
-// curl -X GET "https://mainnet-algorand.api.purestake.io/ps2/v2/status" -H "x-api-key:QgOcdLWZn84sAfFfIK6SN2h3FR7P8TgY9E8YlEAI"
+// curl -X GET "https://mainnet-algorand.api.purestake.io/ps2/v2/status" -H "x-api-key:Enter your PureStake API key here.."
 
         // Setup AlgodClient Connection
 
@@ -64,7 +64,7 @@ async function deployContract(){
             appArgs.push(algosdk.encodeUint64(token_address));
             appArgs.push(algosdk.encodeUint64(token_buffer));
 
-            let owner = "GAJPADR5Y3ESQMP2LRGYKEADLBW6HXS5E3MDTQ7PCQS76EZTFJ4ZYH2VIE";
+            let owner = "Enter owner wallet address here";
             accounts = [owner];
             foreignApps = [];
             foreignAssets = [];

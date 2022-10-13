@@ -9,14 +9,9 @@ async function noop() {
         const algodServer = 'http://18.220.61.102';
         const algodPort = 4001;
         let algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
-
-// // ADMIN
-//     let creatorMnemonic = "flight permit skill quick enforce strong hobby cloud letter foot can fee affair buddy exact link glare amused drama rain airport casual shoe abstract puppy";
-//     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
-//     let sender = creatorAccount.addr;
-    
+   
 // Owner 
-let creatorMnemonic = "bulk narrow warrior rally table smoke return pyramid drink sphere picnic rice manage village purse illegal problem trim arrange urban theme nerve dragon abstract chalk";
+let creatorMnemonic = "Enter your Mnemonics here to execute the script";
 let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
 let sender = creatorAccount.addr;
 

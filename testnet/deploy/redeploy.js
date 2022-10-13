@@ -2,9 +2,9 @@ const { waitForConfirmation,ALGORAND_MIN_TX_FEE, default: algosdk } = require('a
 // require('./deploy.js');
 const { readApprovalTeal, readClearTeal } = require('./compile');
 
-setup();
+redeploy();
 
-async function setup() {
+async function redeploy() {
         // Setup AlgodClient Connection
         const algodToken = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
         // const algodServer = 'http://18.220.61.102';
@@ -13,7 +13,7 @@ async function setup() {
         let algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
 
 // ADMIN
-    let creatorMnemonic = "flight permit skill quick enforce strong hobby cloud letter foot can fee affair buddy exact link glare amused drama rain airport casual shoe abstract puppy";
+    let creatorMnemonic = "Enter your Mnemonics here to execute the script";
     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
     let sender = creatorAccount.addr;
     

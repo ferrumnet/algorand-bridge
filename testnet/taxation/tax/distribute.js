@@ -11,14 +11,9 @@ async function setup() {
         let algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
 
 // ADMIN
-    let creatorMnemonic = "flight permit skill quick enforce strong hobby cloud letter foot can fee affair buddy exact link glare amused drama rain airport casual shoe abstract puppy";
+    let creatorMnemonic = "Enter your Mnemonics here to execute the script";
     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
     let sender = creatorAccount.addr;
-
-//     // Staker 1 
-// let creatorMnemonic = "bulk narrow warrior rally table smoke return pyramid drink sphere picnic rice manage village purse illegal problem trim arrange urban theme nerve dragon abstract chalk";
-// let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
-// let sender = creatorAccount.addr;
     
 // get node suggested parameters (sp)
 let suggestedParams = await algodClient.getTransactionParams().do();

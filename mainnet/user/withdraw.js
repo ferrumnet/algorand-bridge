@@ -1,33 +1,17 @@
 const { waitForConfirmation, default: algosdk, ALGORAND_MIN_TX_FEE } = require('algosdk');
-const { ToBytes } = require('casper-js-sdk');
-// require('./deploy.js');
 var ByteBuffer = require('bytebuffer');
-var convertStringBytes = require('convert-string-bytes');
-const { stringToBytes } = require('convert-string');
 
-setup();
+withdraw();
 
-// curl -X GET "https://mainnet-algorand.api.purestake.io/ps2/v2/status" -H "x-api-key:QgOcdLWZn84sAfFfIK6SN2h3FR7P8TgY9E8YlEAI"
-
-async function setup() {
+async function withdraw() {
         // Setup AlgodClient Connection
-    const token = { 'X-API-key': 'QgOcdLWZn84sAfFfIK6SN2h3FR7P8TgY9E8YlEAI' }
+    const token = { 'X-API-key': 'Enter your PureStake API key here..' }
     let algodClient = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '');
 
 // // ADMIN
-    let creatorMnemonic = "pink faint about build crime cause gossip leopard chat utility network mansion tunnel armed blue clean much claim switch unfold saddle victory know absent legend";
+    let creatorMnemonic = "Enter your Mnemonics here to execute the script";
     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
     let sender = creatorAccount.addr;
-    
-// // Staker 1 
-// let creatorMnemonic = "oven visual long lunar bubble supply ozone coast gown auction service comic pink hockey scorpion announce bind cradle unfold siege play long vacuum absorb win";
-// let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
-// let sender = creatorAccount.addr;
-
-// // Staker 2
-// let creatorMnemonic = "exclude cute joy nest rebel food amazing ship monster gift deny master rare chef ice length raccoon capable hair hamster genre gun style abandon daughter";
-// let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
-// let sender = creatorAccount.addr;
     
 // get node suggested parameters (sp)
 let suggestedParams = await algodClient.getTransactionParams().do();
@@ -38,7 +22,9 @@ let index = 885277315;
 let taxIndex = 885279530;
 let token_address = 885201687;
 
-account = ["LQOQ5NJTFGV6Z7O6TD5JCODOUJZUGJ43OLZ4IVZHJGQKPODS5EMP7JVKJ4", "247QELZSSP4IODWTIOS4GM7LSCLKFPVB3XR6BBUXG3VC45IDF2EJ3HW43E", "SQWK3FEQ2ENAXZV2PPPSQSOW2QVNDDQHW2L2E5O7SMTDYVHR7Q7RMXZXK4", "Q6YCKI5SG7ZFLJ3BS6WGRJ5PJPAD3XCG4GRPYL3Y5U7QPAF4UOJYDRBNLE"];
+// Once the withdraw is processed, the bridge fee will be deducted and added to the Bridge Tax Contract (..NLE)
+// Bridge Tax Wallets are the ones where bridge tax will be distributed from bridge tax contract
+account = ["Q6YCKI5SG7ZFLJ3BS6WGRJ5PJPAD3XCG4GRPYL3Y5U7QPAF4UOJYDRBNLE", "Bridge Tax Wallet 1", "Bridge Tax Wallet 2", "Bridge Tax Wallet 3"];
 foreignApp = [];
 foreignApp.push(taxIndex);
 foreignAssets = [];

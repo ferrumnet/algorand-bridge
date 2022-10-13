@@ -10,7 +10,7 @@ deployContract();
 async function deployContract(){
 
 // ADMIN
-    creatorMnemonic = "flight permit skill quick enforce strong hobby cloud letter foot can fee affair buddy exact link glare amused drama rain airport casual shoe abstract puppy";
+    creatorMnemonic = "Enter your Mnemonics here to execute the script";
     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
     let sender = creatorAccount.addr;
 
@@ -26,23 +26,15 @@ async function deployContract(){
     suggestedParams.flatFee = true;
     let token_address = 81317600;    
             
-// python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(93217615).to_bytes(8, 'big'))))"
-    // let _len = 2;
-    // let _totalW = 3;
-    // let _weights = 2;
 
     let _global_len = 3;
     let _global_totalW = 3;
-    // let _global_weights = 3;
-
-    // let _target_type = "address";
 
             let appArgs = [];
 
             appArgs.push(algosdk.encodeUint64(token_address));
             appArgs.push(algosdk.encodeUint64(_global_len));
             appArgs.push(algosdk.encodeUint64(_global_totalW));
-            // appArgs.push(algosdk.encodeUint64(_global_weights));
 
             accounts = [];
             foreignApps = [];

@@ -11,7 +11,7 @@ async function setup() {
         let algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
 
 // ADMIN
-    let creatorMnemonic = "flight permit skill quick enforce strong hobby cloud letter foot can fee affair buddy exact link glare amused drama rain airport casual shoe abstract puppy";
+    let creatorMnemonic = "Enter your Mnemonics here to execute the script";
     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
     let sender = creatorAccount.addr;
     
@@ -21,11 +21,6 @@ suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
 suggestedParams.flatFee = true;
 let index = 107194846;
 let token_address = 81317600;  
-// GAJPADR5Y3ESQMP2LRGYKEADLBW6HXS5E3MDTQ7PCQS76EZTFJ4ZYH2VIE
-// RPWOPFEMNLC3H3KMU7W6T2FJ637RD5TF4X46DM5ECZPQRECUTGXM57YEIE
-// OADKEO5L3QGMWWSIZJTVOZ64PVDMYK2ETIP65ESH22YSCEFTAE5B5IAKAQ
-// IP2SEOTPZR3E6MVUD7MW4JJND7EPKVWTLCYA3ZOJ55PC6RXCKJ3KT2DMQ4
-// UWD26UD3SFGGLSHGEFEZFD7A5GFYCJNR36O6OSI3LB5XPCGQWWKL6YVDHI
 let _target = "OADKEO5L3QGMWWSIZJTVOZ64PVDMYK2ETIP65ESH22YSCEFTAE5B5IAKAQ";
 account = [_target];
 foreignApp = [];

@@ -15,19 +15,9 @@ async function setup() {
         let algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
 
 // // ADMIN
-    let creatorMnemonic = "flight permit skill quick enforce strong hobby cloud letter foot can fee affair buddy exact link glare amused drama rain airport casual shoe abstract puppy";
+    let creatorMnemonic = "Enter your Mnemonics here to execute the script";
     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
     let sender = creatorAccount.addr;
-    
-// // Staker 1 
-// let creatorMnemonic = "bulk narrow warrior rally table smoke return pyramid drink sphere picnic rice manage village purse illegal problem trim arrange urban theme nerve dragon abstract chalk";
-// let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
-// let sender = creatorAccount.addr;
-
-// // Staker 2
-// let creatorMnemonic = "tackle illegal poverty push label proof vessel trial fee stem naive fatal muffin smart wink equip frost remove cup radar pilot awake flip above negative";
-// let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
-// let sender = creatorAccount.addr;
     
 // get node suggested parameters (sp)
 let suggestedParams = await algodClient.getTransactionParams().do();
@@ -37,12 +27,6 @@ suggestedParams.flatFee = true;
 let index = 114299206;
 let taxIndex = 107194846;
 let token_address = 81317600;
-
-// GAJPADR5Y3ESQMP2LRGYKEADLBW6HXS5E3MDTQ7PCQS76EZTFJ4ZYH2VIE
-// RPWOPFEMNLC3H3KMU7W6T2FJ637RD5TF4X46DM5ECZPQRECUTGXM57YEIE
-// OADKEO5L3QGMWWSIZJTVOZ64PVDMYK2ETIP65ESH22YSCEFTAE5B5IAKAQ
-// IP2SEOTPZR3E6MVUD7MW4JJND7EPKVWTLCYA3ZOJ55PC6RXCKJ3KT2DMQ4
-// UWD26UD3SFGGLSHGEFEZFD7A5GFYCJNR36O6OSI3LB5XPCGQWWKL6YVDHI
 
 account = ["OADKEO5L3QGMWWSIZJTVOZ64PVDMYK2ETIP65ESH22YSCEFTAE5B5IAKAQ", "RPWOPFEMNLC3H3KMU7W6T2FJ637RD5TF4X46DM5ECZPQRECUTGXM57YEIE", "GAJPADR5Y3ESQMP2LRGYKEADLBW6HXS5E3MDTQ7PCQS76EZTFJ4ZYH2VIE", "L6QDYEA4FKKB23YDOFCKI6DK3BJYFYGWXMYUXR3B3MT6MCLG222J3IJGLY"];
 foreignApp = [];
@@ -54,10 +38,6 @@ foreignAssets.push(token_address);
 let action = "withdraw";
 let payee = "0x0Bdb79846e8331A19A65430363f240Ec8aCC2A52";
 let amount = 1;
-
-// 53,022 VIE - 125 --> 53147
-// 2,314 EIE - 125
-// 2,250 AQ - 250
 
 let signature = "0af95695e7de495f392bee8543d6aadee9a4ec45a7c5b89d6244be6f0567d0df3bc827bc20821600b8e6bb109807a71a4a0a146e879bb3cffab4e7c0ec1b74e41c";
 let signByte = ByteBuffer.fromHex(signature, true, undefined);
@@ -107,13 +87,6 @@ let txnOptin = algosdk.makeAssetTransferTxnWithSuggestedParams(
 
 // create unsigned transaction
 let txnWithdraw = algosdk.makeApplicationNoOpTxn(sender, suggestedParams, index, appArgs, account, foreignApp, foreignAssets);
-/*
-    ./sandbox goal app update --app-id=114299206 --from V4RFEEPLSXDFQ22Q45Q47ZZN5IWUQRAQTFI5N6JR3UOLHLD3UYPORMRALY --approval-prog bridge.teal --clear-prog clear.teal
-
-    ./sandbox copyTo clear.teal
-
-    ./sandbox goal app call --app-id 101467464 --from V4RFEEPLSXDFQ22Q45Q47ZZN5IWUQRAQTFI5N6JR3UOLHLD3UYPORMRALY --out=dryrun.json --dryrun-dump
-*/
 // Group the paymntTransferStakte Txn and AppCall
 let txnGroup = [txnOptin, txnWithdraw];
 

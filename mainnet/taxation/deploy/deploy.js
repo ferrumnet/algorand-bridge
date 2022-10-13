@@ -10,12 +10,12 @@ deployContract();
 async function deployContract(){
 
 // ADMIN
-    creatorMnemonic = "pink faint about build crime cause gossip leopard chat utility network mansion tunnel armed blue clean much claim switch unfold saddle victory know absent legend";
+    creatorMnemonic = "Enter your Mnemonics here to execute the script";
     let creatorAccount = algosdk.mnemonicToSecretKey(creatorMnemonic);
     let sender = creatorAccount.addr;
 
         // Setup AlgodClient Connection
-const token = { 'X-API-key': 'QgOcdLWZn84sAfFfIK6SN2h3FR7P8TgY9E8YlEAI' }
+const token = { 'X-API-key': 'Enter your PureStake API key here..' }
     let algodClient = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '');
 
     // get node suggested parameters (sp)
@@ -23,15 +23,9 @@ const token = { 'X-API-key': 'QgOcdLWZn84sAfFfIK6SN2h3FR7P8TgY9E8YlEAI' }
     suggestedParams.fee = ALGORAND_MIN_TX_FEE * 2;
     suggestedParams.flatFee = true;
     let token_address = 885201687;    
-            
-// python3 -c "import algosdk.encoding as e; print(e.encode_address(e.checksum(b'appID'+(93217615).to_bytes(8, 'big'))))"
-    // let _len = 2;
-    // let _totalW = 3;
-    // let _weights = 2;
-
+     
     let _global_len = 3;
     let _global_totalW = 4;
-
 
             let appArgs = [];
 

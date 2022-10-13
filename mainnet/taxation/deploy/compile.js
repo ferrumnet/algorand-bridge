@@ -24,7 +24,7 @@ async function getCompiledResult(data){
 
 async function compileTEAL(content){
         // Setup AlgodClient Connection
-        const token = { 'X-API-key': 'QgOcdLWZn84sAfFfIK6SN2h3FR7P8TgY9E8YlEAI' }
+        const token = { 'X-API-key': 'Enter your PureStake API key here..' }
         let algodClient = new algosdk.Algodv2(token, 'https://mainnet-algorand.api.purestake.io/ps2', '');
 
     // Read Teal from Content
